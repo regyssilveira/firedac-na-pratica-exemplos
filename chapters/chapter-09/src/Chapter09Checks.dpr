@@ -13,6 +13,7 @@ uses
   Vcl.Forms,
   Vcl.StdCtrls,
   FireDAC.Stan.Intf,
+  FireDAC.Stan.Tracer,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
   FireDAC.Stan.Def,
@@ -110,6 +111,7 @@ begin
       Monitor.FileName := TraceFile;
       { Keep automated runs non-interactive.  The trace remains on disk, but
         FireDAC must not display its finalization dialog. }
+      FADShowTraces := False;
       Monitor.ShowTraces := False;
       Monitor.Tracing := True;
     end;

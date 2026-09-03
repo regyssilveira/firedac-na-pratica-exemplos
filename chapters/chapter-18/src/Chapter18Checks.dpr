@@ -11,6 +11,7 @@ uses
   Winapi.PsAPI,
   Data.DB,
   FireDAC.Stan.Intf,
+  FireDAC.Stan.Tracer,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
   FireDAC.Stan.Def,
@@ -125,6 +126,7 @@ begin
       TraceFile := RequiredEnvironment('CH18_TRACE_FILE');
       if FileExists(TraceFile) then TFile.Delete(TraceFile);
       Monitor.FileName := TraceFile; Monitor.FileAppend := False;
+      FADShowTraces := False;
       Monitor.ShowTraces := False; Monitor.Tracing := True;
       Conn.Params.Values['MonitorBy'] := 'FlatFile';
     end;

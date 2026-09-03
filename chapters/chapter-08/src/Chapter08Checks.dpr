@@ -9,6 +9,7 @@ uses
   System.Variants,
   Data.DB,
   FireDAC.Stan.Intf,
+  FireDAC.Stan.Tracer,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
   FireDAC.Stan.Def,
@@ -102,6 +103,9 @@ begin
     if FileExists(TraceFile) then
       TFile.Delete(TraceFile);
     Monitor.FileName := TraceFile;
+    { The validator writes the trace as evidence and must remain non-interactive. }
+    FADShowTraces := False;
+    Monitor.ShowTraces := False;
     Monitor.Tracing := True;
     ConfigureConnection(Connection, FBLink);
     Connection.Params.Values['MonitorBy'] := 'FlatFile';
