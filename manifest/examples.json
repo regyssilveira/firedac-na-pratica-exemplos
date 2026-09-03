@@ -456,140 +456,180 @@
       "chapter": 11,
       "title": "Mestre-detalhe por parâmetros",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-02",
       "chapter": 11,
       "title": "Mestre-detalhe por ranges",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-03",
       "chapter": 11,
       "title": "Inclusão com chave gerada",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-04",
       "chapter": 11,
       "title": "Cascata local e no servidor",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-05",
       "chapter": 11,
       "title": "TFDSchemaAdapter atômico",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-06",
       "chapter": 11,
       "title": "Cache de detalhes com fiDetails",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-07",
       "chapter": 11,
       "title": "DetailDelay e navegação rápida",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-08",
       "chapter": 11,
       "title": "Chave composta e DetailFields",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-09",
       "chapter": 11,
       "title": "Mestre novo com vários detalhes",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-10",
       "chapter": 11,
       "title": "Conflito, rollback e nova tentativa",
       "status": "RV",
-      "evidence": ["chapters/chapter-11/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
+      ]
     },
     {
       "id": "EX-12-01",
       "chapter": 12,
       "title": "Procedure com entrada e saída",
       "status": "RV",
-      "evidence": ["chapters/chapter-12/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-12/evidence/README.md"
+      ]
     },
     {
       "id": "EX-12-02",
       "chapter": 12,
       "title": "Função escalar e tabular",
       "status": "RV",
-      "evidence": ["chapters/chapter-12/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-12/evidence/README.md"
+      ]
     },
     {
       "id": "EX-12-03",
       "chapter": 12,
       "title": "Múltiplos resultados suportados",
       "status": "RV",
-      "evidence": ["chapters/chapter-12/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-12/evidence/README.md"
+      ]
     },
     {
       "id": "EX-12-04",
       "chapter": 12,
       "title": "Fechamento de pedido no servidor",
       "status": "RV",
-      "evidence": ["chapters/chapter-12/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-12/evidence/README.md"
+      ]
     },
     {
       "id": "EX-12-05",
       "chapter": 12,
       "title": "Evento do banco na aplicação",
       "status": "RV",
-      "evidence": ["chapters/chapter-12/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-12/evidence/README.md"
+      ]
     },
     {
       "id": "EX-13-01",
       "chapter": 13,
       "title": "Array DML de produtos",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-13/evidence/README.md"
+      ]
     },
     {
       "id": "EX-13-02",
       "chapter": 13,
       "title": "Erro parcial em lote",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-13/evidence/README.md"
+      ]
     },
     {
       "id": "EX-13-03",
       "chapter": 13,
       "title": "Batch Move CSV para banco",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-13/evidence/README.md"
+      ]
     },
     {
       "id": "EX-13-04",
       "chapter": 13,
       "title": "Transferência entre dois SGBDs",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-13/evidence/README.md"
+      ]
     },
     {
       "id": "EX-13-05",
       "chapter": 13,
       "title": "Benchmark linha a linha versus lote",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-13/evidence/README.md"
+      ]
     },
     {
       "id": "EX-14-01",
