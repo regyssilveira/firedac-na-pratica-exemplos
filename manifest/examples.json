@@ -850,36 +850,36 @@
       "id": "EX-19-01",
       "chapter": 19,
       "title": "amAsync com espera",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-19/evidence/README.md", "chapters/chapter-19/evidence/bm-09-raw.csv"]
     },
     {
       "id": "EX-19-02",
       "chapter": 19,
       "title": "Cancelamento assíncrono",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-19/evidence/README.md"]
     },
     {
       "id": "EX-19-03",
       "chapter": 19,
       "title": "TTask com conexão própria",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-19/evidence/README.md"]
     },
     {
       "id": "EX-19-04",
       "chapter": 19,
       "title": "Pool sob concorrência",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-19/evidence/README.md", "chapters/chapter-19/evidence/bm-08-raw.csv"]
     },
     {
       "id": "EX-19-05",
       "chapter": 19,
       "title": "Falha e esgotamento do pool",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-19/evidence/README.md"]
     },
     {
       "id": "EX-20-01",
