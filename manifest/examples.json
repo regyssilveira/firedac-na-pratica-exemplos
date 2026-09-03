@@ -680,36 +680,46 @@
       "id": "EX-15-01",
       "chapter": 15,
       "title": "Round-trip binário",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-15/evidence/README.md"
+      ]
     },
     {
       "id": "EX-15-02",
       "chapter": 15,
       "title": "Round-trip XML",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-15/evidence/README.md"
+      ]
     },
     {
       "id": "EX-15-03",
       "chapter": 15,
       "title": "JSON FireDAC versus JSON livre",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-15/evidence/README.md"
+      ]
     },
     {
       "id": "EX-15-04",
       "chapter": 15,
       "title": "Persistência automática com backup",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-15/evidence/README.md"
+      ]
     },
     {
       "id": "EX-15-05",
       "chapter": 15,
       "title": "Cache versionado e arquivo corrompido",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-15/evidence/README.md"
+      ]
     },
     {
       "id": "EX-16-01",
