@@ -1,0 +1,17 @@
+﻿================================
+FireDAC info
+================================
+Tool = RAD Studio 13
+FireDAC = 37.0.57242.3601
+Platform = Windows 32 bit
+Defines = FireDAC_NOLOCALE_META;FireDAC_MONITOR
+================================
+Client info
+================================
+Brand = Firebird
+Client version = 500049900
+================================
+Session info
+================================
+Current catalog = 
+Current schema = 

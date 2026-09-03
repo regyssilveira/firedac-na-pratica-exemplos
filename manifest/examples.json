@@ -815,36 +815,36 @@
       "id": "EX-18-01",
       "chapter": 18,
       "title": "Monitor de round trips",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-18/evidence/README.md", "chapters/chapter-18/evidence/bm-10-raw.csv"]
     },
     {
       "id": "EX-18-02",
       "chapter": 18,
       "title": "Prepare versus execução ad hoc",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-18/evidence/README.md"]
     },
     {
       "id": "EX-18-03",
       "chapter": 18,
       "title": "Fetch options comparadas",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-18/evidence/README.md", "chapters/chapter-18/evidence/bm-02-raw.csv"]
     },
     {
       "id": "EX-18-04",
       "chapter": 18,
       "title": "Plano de execução do SGBD",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-18/evidence/README.md"]
     },
     {
       "id": "EX-18-05",
       "chapter": 18,
       "title": "Relatório técnico automático",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-18/evidence/README.md", "chapters/chapter-18/evidence/environment-Win32-SQLite.txt", "chapters/chapter-18/evidence/environment-Win32-FB.txt", "chapters/chapter-18/evidence/environment-Win64-SQLite.txt", "chapters/chapter-18/evidence/environment-Win64-FB.txt"]
     },
     {
       "id": "EX-19-01",
