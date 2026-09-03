@@ -885,36 +885,36 @@
       "id": "EX-20-01",
       "chapter": 20,
       "title": "Listagem de catálogos/schemas/tabelas",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-20/evidence/README.md"]
     },
     {
       "id": "EX-20-02",
       "chapter": 20,
       "title": "Campos, chaves e índices",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-20/evidence/README.md"]
     },
     {
       "id": "EX-20-03",
       "chapter": 20,
       "title": "Procedures e parâmetros",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-20/evidence/README.md"]
     },
     {
       "id": "EX-20-04",
       "chapter": 20,
       "title": "Mini Database Explorer",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-20/evidence/README.md"]
     },
     {
       "id": "EX-20-05",
       "chapter": 20,
       "title": "Eventos e automação",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-20/evidence/README.md"]
     },
     {
       "id": "EX-21-01",
