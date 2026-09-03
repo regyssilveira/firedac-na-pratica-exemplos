@@ -455,71 +455,71 @@
       "id": "EX-11-01",
       "chapter": 11,
       "title": "Mestre-detalhe por parâmetros",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-02",
       "chapter": 11,
       "title": "Mestre-detalhe por ranges",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-03",
       "chapter": 11,
       "title": "Inclusão com chave gerada",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-04",
       "chapter": 11,
       "title": "Cascata local e no servidor",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-05",
       "chapter": 11,
       "title": "TFDSchemaAdapter atômico",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-06",
       "chapter": 11,
       "title": "Cache de detalhes com fiDetails",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-07",
       "chapter": 11,
       "title": "DetailDelay e navegação rápida",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-08",
       "chapter": 11,
       "title": "Chave composta e DetailFields",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-09",
       "chapter": 11,
       "title": "Mestre novo com vários detalhes",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-11-10",
       "chapter": 11,
       "title": "Conflito, rollback e nova tentativa",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-11/evidence/README.md"]
     },
     {
       "id": "EX-12-01",
