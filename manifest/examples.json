@@ -320,36 +320,46 @@
       "id": "EX-08-01",
       "chapter": 8,
       "title": "Campo calculado",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-08/evidence/README.md"
+      ]
     },
     {
       "id": "EX-08-02",
       "chapter": 8,
       "title": "Campo lookup",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-08/evidence/README.md"
+      ]
     },
     {
       "id": "EX-08-03",
       "chapter": 8,
       "title": "Agregado de itens",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-08/evidence/README.md"
+      ]
     },
     {
       "id": "EX-08-04",
       "chapter": 8,
       "title": "Atualização de consulta com join",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-08/evidence/README.md"
+      ]
     },
     {
       "id": "EX-08-05",
       "chapter": 8,
       "title": "TFDUpdateSQL explícito",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-08/evidence/README.md"
+      ]
     },
     {
       "id": "EX-09-01",
