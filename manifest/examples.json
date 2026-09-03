@@ -320,7 +320,7 @@
       "id": "EX-08-01",
       "chapter": 8,
       "title": "Campo calculado",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-08/evidence/README.md"
       ]
@@ -329,7 +329,7 @@
       "id": "EX-08-02",
       "chapter": 8,
       "title": "Campo lookup",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-08/evidence/README.md"
       ]
@@ -338,7 +338,7 @@
       "id": "EX-08-03",
       "chapter": 8,
       "title": "Agregado de itens",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-08/evidence/README.md"
       ]
@@ -347,7 +347,7 @@
       "id": "EX-08-04",
       "chapter": 8,
       "title": "Atualização de consulta com join",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-08/evidence/README.md"
       ]
@@ -356,7 +356,7 @@
       "id": "EX-08-05",
       "chapter": 8,
       "title": "TFDUpdateSQL explícito",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-08/evidence/README.md"
       ]

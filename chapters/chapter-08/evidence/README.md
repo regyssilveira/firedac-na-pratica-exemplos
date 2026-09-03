@@ -62,3 +62,14 @@ concorrente permaneceu. Por fim, a segunda conexão restaura o registro do labor
 O ensaio não cobre cached updates, inserts com refresh de chaves, deletes, triggers,
 joins de múltiplas tabelas editáveis nem reconciliação visual. Esses contratos serão
 tratados nos capítulos de transação, mestre-detalhe e trabalho desconectado.
+
+## Revisão contra o manuscrito
+
+Fonte, trace, saídas e Capítulo 8 foram confrontados. O texto agora exige flags vazias
+nos campos virtuais criados em runtime, documenta a ativação do agregado, separa
+`Post` de `Commit`, mostra o SQL automático capturado e identifica conflito somente
+pela exceção específica de zero linhas atualizadas.
+
+EX-08-01 a EX-08-05 podem avançar a `RV`. Cada afirmação apresentada como resultado
+possui asserção nos binários correspondentes; cached updates, inserts e reconciliação
+continuam fora desse estado.
