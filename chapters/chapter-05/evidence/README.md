@@ -40,12 +40,36 @@ inalterados.
   sobreposição. Sem mutação concorrente, offset e keyset devolveram a mesma segunda
   página sob `ORDER BY name, id`.
 
+## BM-03 — offset alto versus keyset
+
+O benchmark cria 100 mil produtos com chaves pares, fora da medição, e consulta 50
+linhas na posição 90 mil. Um aquecimento é descartado e cinco repetições são
+registradas por perfil. As medianas foram:
+
+| Perfil | Offset (µs) | Keyset (µs) |
+|---|---:|---:|
+| SQLite Win32 | 1.117 | 103 |
+| Firebird Win32 | 40.980 | 950 |
+| SQLite Win64 | 1.156 | 90 |
+| Firebird Win64 | 99.364 | 1.171 |
+
+Antes da mutação, ambos começam no id 280000. O ensaio insere então uma chave ímpar
+antes da fronteira já visitada. A mesma posição por offset passa a começar na última
+chave da página anterior, produzindo duplicação; o cursor keyset `id > 279998`
+continua começando em 280000. Essa asserção passou nas vinte repetições registradas.
+O CSV `bm-03-raw.csv` conserva tempos, fronteira e estados de estabilidade.
+
+Os valores não comparam capacidade dos SGBDs nem provam que keyset vence em qualquer
+consulta. A massa, o índice, o offset e o cache são controlados neste cenário. Keyset
+também exige ordenação única e não oferece salto arbitrário para “página 900” sem um
+cursor ou índice auxiliar.
+
 ## Limites da evidência
 
-O ensaio comprova correção funcional em conjunto pequeno. Ele não mede ganho de
-desempenho de `Prepare`, custo de offsets altos nem comportamento sob alterações
-concorrentes. Esses pontos exigem experimentos específicos nos capítulos de fetch,
-concorrência e desempenho.
+O ensaio funcional comprova correção em conjunto pequeno; BM-03 acrescenta custo de
+offset alto e uma escrita anterior à fronteira. Ele não mede ganho de `Prepare`,
+latência de rede remota, deletes/updates concorrentes nem ordenação não única. Esses
+pontos exigem experimentos específicos para cada consulta e ambiente.
 
 ## Revisão contra o manuscrito
 
@@ -56,5 +80,6 @@ Firebird e limitar a comparação de offset e keyset ao cenário sem mutação c
 
 Os exemplos EX-05-01 a EX-05-05 podem avançar a `RV`: cada afirmação apresentada
 como resultado do laboratório possui uma asserção correspondente nos quatro perfis.
-`NextRecordSet`, desempenho de preparação e concorrência durante a paginação não são
-promovidos como resultados deste projeto.
+`NextRecordSet` e desempenho de preparação não são promovidos como resultados deste
+projeto. A concorrência de BM-03 é uma mutação determinística dentro do laboratório,
+não uma simulação de carga multissessão.

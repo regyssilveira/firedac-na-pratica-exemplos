@@ -6,6 +6,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Generics.Collections,
+  System.Diagnostics,
   Winapi.Windows,
   Data.DB,
   FireDAC.Stan.Intf,
@@ -356,9 +357,131 @@ begin
     end);
 end;
 
+procedure PreparePaginationMass(AConnection: TFDConnection; ACount: Integer);
+var
+  Query: TFDQuery;
+  I: Integer;
+begin
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := AConnection;
+    Query.SQL.Text :=
+      'INSERT INTO product (id, sku, name, category_id, price, active) ' +
+      'VALUES (:id, :sku, :name, :category_id, :price, :active)';
+    Query.Params.ArraySize := ACount;
+    for I := 0 to ACount - 1 do
+    begin
+      Query.ParamByName('id').AsLargeInts[I] := 100000 + Int64(I) * 2;
+      Query.ParamByName('sku').AsStrings[I] := Format('BM03-%.6d', [I]);
+      Query.ParamByName('name').AsStrings[I] := Format('Página %.6d', [I]);
+      Query.ParamByName('category_id').AsLargeInts[I] := 1;
+      Query.ParamByName('price').AsCurrencys[I] := 1;
+      Query.ParamByName('active').AsBooleans[I] := True;
+    end;
+    Query.Execute(ACount, 0);
+  finally
+    Query.Free;
+  end;
+end;
+
+procedure MeasurePaginationPage(AConnection: TFDConnection; AUseKeyset: Boolean;
+  AOffset: Integer; ALastId: Int64; out AElapsedUs, AFirstId, AFinalId: Int64;
+  out ACount: Integer);
+const
+  CPageSize = 50;
+var
+  Query: TFDQuery;
+  Timer: TStopwatch;
+begin
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := AConnection;
+    if AUseKeyset then
+    begin
+      if IsFirebird then
+        Query.SQL.Text := 'SELECT id FROM product WHERE id > :last_id ' +
+          'ORDER BY id FETCH FIRST :page_size ROWS ONLY'
+      else
+        Query.SQL.Text := 'SELECT id FROM product WHERE id > :last_id ' +
+          'ORDER BY id LIMIT :page_size';
+      Query.ParamByName('last_id').AsLargeInt := ALastId;
+    end
+    else
+    begin
+      if IsFirebird then
+        Query.SQL.Text := 'SELECT id FROM product WHERE id >= 100000 ORDER BY id ' +
+          'OFFSET :row_offset ROWS FETCH NEXT :page_size ROWS ONLY'
+      else
+        Query.SQL.Text := 'SELECT id FROM product WHERE id >= 100000 ORDER BY id ' +
+          'LIMIT :page_size OFFSET :row_offset';
+      Query.ParamByName('row_offset').AsInteger := AOffset;
+    end;
+    Query.ParamByName('page_size').AsInteger := CPageSize;
+    Timer := TStopwatch.StartNew;
+    Query.Open;
+    Query.FetchAll;
+    AElapsedUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    ACount := Query.RecordCount;
+    Check(ACount = CPageSize, 'Página do BM-03 não contém 50 linhas.');
+    Query.First;
+    AFirstId := Query.FieldByName('id').AsLargeInt;
+    Query.Last;
+    AFinalId := Query.FieldByName('id').AsLargeInt;
+  finally
+    Query.Free;
+  end;
+end;
+
+procedure RunPaginationBenchmark;
+const
+  CRowCount = 100000;
+  COffset = 90000;
+  CBoundaryId = 100000 + Int64(COffset - 1) * 2;
+var
+  OffsetUs, KeysetUs, IgnoredUs: Int64;
+  OffsetFirst, OffsetLast, KeysetFirst, KeysetLast: Int64;
+  MutatedOffsetFirst, MutatedOffsetLast, MutatedKeysetFirst, MutatedKeysetLast: Int64;
+  Count: Integer;
+begin
+  WithConnection(
+    procedure(Connection: TFDConnection)
+    begin
+      Connection.StartTransaction;
+      try
+        PreparePaginationMass(Connection, CRowCount);
+        MeasurePaginationPage(Connection, False, COffset, 0,
+          OffsetUs, OffsetFirst, OffsetLast, Count);
+        MeasurePaginationPage(Connection, True, 0, CBoundaryId,
+          KeysetUs, KeysetFirst, KeysetLast, Count);
+        Check((OffsetFirst = KeysetFirst) and (OffsetLast = KeysetLast),
+          'Offset e keyset divergiram antes da escrita concorrente simulada.');
+
+        Connection.ExecSQL(
+          'INSERT INTO product (id, sku, name, category_id, price, active) ' +
+          'VALUES (100001, ''BM03-INSERT'', ''Inserido antes da fronteira'', 1, 1, :active)',
+          [True]);
+        MeasurePaginationPage(Connection, False, COffset, 0,
+          IgnoredUs, MutatedOffsetFirst, MutatedOffsetLast, Count);
+        MeasurePaginationPage(Connection, True, 0, CBoundaryId,
+          IgnoredUs, MutatedKeysetFirst, MutatedKeysetLast, Count);
+        Check(MutatedOffsetFirst = CBoundaryId,
+          'Offset não expôs a duplicação esperada após inserção anterior.');
+        Check((MutatedKeysetFirst = KeysetFirst) and
+          (MutatedKeysetLast = KeysetLast),
+          'Keyset mudou após inserção anterior à fronteira.');
+        Writeln(Format('BM-03 rows=%d offset=%d page_size=50 offset_us=%d ' +
+          'keyset_us=%d first_id=%d offset_stable=False keyset_stable=True',
+          [CRowCount, COffset, OffsetUs, KeysetUs, KeysetFirst]));
+      finally
+        if Connection.InTransaction then
+          Connection.Rollback;
+      end;
+    end);
+end;
+
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter05Checks list|dml|command|key|pagination');
+  Writeln('Uso: Chapter05Checks list|dml|command|key|pagination|benchmark-pagination');
 end;
 
 begin
@@ -378,6 +501,8 @@ begin
       RunGeneratedKey
     else if SameText(ParamStr(1), 'pagination') then
       RunPagination
+    else if SameText(ParamStr(1), 'benchmark-pagination') then
+      RunPaginationBenchmark
     else
     begin
       ShowUsage;
