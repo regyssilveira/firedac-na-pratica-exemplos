@@ -72,12 +72,44 @@ cancelamento. O trace `FlatFile` foi habilitado apenas no teste de BLOB: instrum
 a medição de fetch alterava fortemente o tempo observado. `ShowTraces = False` evita
 caixas de diálogo ao finalizar os executáveis automatizados.
 
+## BM-05 — BLOB imediato, tardio e por stream
+
+Cada variante leu cem BLOBs de 64 KiB, totalizando exatamente 6.553.600 bytes. A
+massa foi preparada fora do cronômetro. Depois de um aquecimento descartado, cinco
+repetições por perfil e variante produziram 60 linhas no CSV. As medianas foram:
+
+| Perfil e modo | `Open` (µs) | Total (µs) | Memória final (bytes) |
+|---|---:|---:|---:|
+| SQLite Win32 imediato | 559 | 2.670 | 6.762.496 |
+| SQLite Win32 tardio | 272 | 8.621 | 7.127.040 |
+| SQLite Win32 stream | 328 | 9.857 | 7.127.040 |
+| Firebird Win32 imediato | 23.069 | 108.028 | 6.963.200 |
+| Firebird Win32 tardio | 2.947 | 155.833 | 7.073.792 |
+| Firebird Win32 stream | 3.644 | 162.083 | 7.073.792 |
+| SQLite Win64 imediato | 606 | 2.917 | 6.873.088 |
+| SQLite Win64 tardio | 274 | 7.271 | 7.221.248 |
+| SQLite Win64 stream | 299 | 7.308 | 7.221.248 |
+| Firebird Win64 imediato | 33.755 | 191.372 | 7.131.136 |
+| Firebird Win64 tardio | 3.627 | 171.406 | 7.245.824 |
+| Firebird Win64 stream | 3.885 | 163.888 | 7.245.824 |
+
+Remover `fiBlobs` reduziu a latência inicial, sobretudo no Firebird, mas transferir
+todos os BLOBs depois deslocou o custo para o tempo total. O stream não reduziu a
+memória final neste desenho: o campo pertence a um dataset com cache e o working set
+terminou no mesmo patamar do acesso tardio por `BlobSize`. Logo, “usar stream” não é
+prova automática de memória constante. Para isso, a aplicação precisa também limitar
+o cache e processar/descartar linhas ou usar um comando apropriado ao fluxo.
+
+Working set é medida do processo, não heap exclusivo do BLOB; pequenas diferenças não
+devem ser atribuídas causalmente ao modo. O resultado útil é separar primeira resposta,
+tempo para consumir tudo, bytes validados e memória observada.
+
 ## Limites
 
-Os números não constituem benchmark científico e variam com máquina, cache, rede e
-carga. O teste não mede latência remota, paginação no servidor, múltiplos result sets
-nem cancelamento durante cada fase possível de um dataset. Esses cenários devem ser
-avaliados com a consulta e o driver reais da aplicação.
+Os números variam com máquina, cache, rede e carga. BM-05 usa conexão TCP local,
+BLOBs uniformes e consumo integral; não cobre arquivos gigantes, leitura parcial,
+rede remota, compressão ou descarte linha a linha. O restante do laboratório não mede
+múltiplos result sets nem cancelamento durante cada fase possível de um dataset.
 
 ## Revisão contra o manuscrito
 

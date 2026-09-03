@@ -8,6 +8,11 @@
   notificação de conclusão e reutiliza a conexão;
 - `feedback`: instancia controles VCL e valida cinco estados da interface.
 
+Os modos `benchmark-blob-immediate`, `benchmark-blob-deferred` e
+`benchmark-blob-stream` executam BM-05 com cem BLOBs de 64 KiB. O protocolo descarta
+um aquecimento e registra cinco repetições por banco e arquitetura em
+`evidence/bm-05-raw.csv`.
+
 ```powershell
 .\scripts\validate-chapter-09.ps1 `
   -AdminPassword '<senha-administrativa>' `

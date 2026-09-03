@@ -34,6 +34,8 @@ $env:FIRESTORE_DB_PORT = '3050'
 $env:FIRESTORE_DB_NAME = $firebirdDatabase.FullName
 $env:FIRESTORE_DB_USER = 'FIRESTORE_APP'
 $env:FIRESTORE_DB_PASSWORD = $AppPassword
+$bm05 = [System.Collections.Generic.List[string]]::new()
+$bm05.Add('benchmark_id,architecture,driver,repetition,mode,rows,blob_size,open_us,total_us,bytes,memory_delta')
 
 foreach ($architecture in @('Win32', 'Win64')) {
   $sqliteDatabase = Get-ChildItem ".deps\firestore\m0-*-$architecture.sqlite" |
@@ -57,6 +59,19 @@ foreach ($architecture in @('Win32', 'Win64')) {
         throw "Teste $mode/$driver/$architecture falhou."
       }
     }
+    $env:CH09_ENABLE_TRACE = '0'
+    foreach ($blobMode in @('immediate', 'deferred', 'stream')) {
+      $warmup = & $executable "benchmark-blob-$blobMode"
+      if ($LASTEXITCODE -ne 0) { throw "Aquecimento BM-05/$blobMode/$driver/$architecture falhou." }
+      for ($rep = 1; $rep -le 5; $rep++) {
+        $result = (& $executable "benchmark-blob-$blobMode") -join ' '
+        if ($LASTEXITCODE -ne 0) { throw "BM-05/$blobMode/$driver/$architecture/repetição $rep falhou." }
+        if ($result -notmatch '^BM-05 mode=(immediate|deferred|stream) rows=(\d+) blob_size=(\d+) open_us=(\d+) total_us=(\d+) bytes=(\d+) memory_delta=(-?\d+)$') {
+          throw "Saída BM-05 inválida: $result"
+        }
+        $bm05.Add("BM-05,$architecture,$driver,$rep,$($Matches[1]),$($Matches[2]),$($Matches[3]),$($Matches[4]),$($Matches[5]),$($Matches[6]),$($Matches[7])")
+      }
+    }
   }
 
   $env:CH09_DRIVER = 'SQLite'
@@ -67,4 +82,6 @@ foreach ($architecture in @('Win32', 'Win64')) {
   if ($LASTEXITCODE -ne 0) { throw "Feedback VCL/$architecture falhou." }
 }
 
-Write-Output 'Capítulo 9 aprovado em SQLite/Firebird, Win32/Win64; feedback VCL executado.'
+$bm05 | Set-Content 'chapters\chapter-09\evidence\bm-05-raw.csv' -Encoding utf8
+
+Write-Output 'Capítulo 9 aprovado em SQLite/Firebird, Win32/Win64; BM-05 normalizado.'

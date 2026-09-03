@@ -286,6 +286,115 @@ begin
     end);
 end;
 
+procedure RunBlobBenchmark(const AMode: string);
+const
+  CRowCount = 100;
+  CBlobSize = 65536;
+var
+  Link: TFDPhysFBDriverLink;
+  Connection: TFDConnection;
+  Insert, Query: TFDQuery;
+  Data: TBytes;
+  Input: TMemoryStream;
+  BlobStream: TStream;
+  Timer: TStopwatch;
+  MemoryBefore, MemoryAfter: UInt64;
+  OpenUs, TotalUs, BytesRead: Int64;
+  I, N, Rows: Integer;
+  Buffer: array[0..8191] of Byte;
+begin
+  Check(SameText(AMode, 'immediate') or SameText(AMode, 'deferred') or
+    SameText(AMode, 'stream'), 'Modo inválido para BM-05.');
+  Link := TFDPhysFBDriverLink.Create(nil);
+  Connection := TFDConnection.Create(nil);
+  Insert := TFDQuery.Create(nil);
+  Query := TFDQuery.Create(nil);
+  Input := TMemoryStream.Create;
+  try
+    ConfigureConnection(Connection, Link);
+    Connection.Open;
+    Connection.StartTransaction;
+    try
+      SetLength(Data, CBlobSize);
+      for I := 0 to High(Data) do
+        Data[I] := Byte((I * 29 + 11) mod 256);
+      Input.WriteBuffer(Data[0], Length(Data));
+      Insert.Connection := Connection;
+      Insert.SQL.Text :=
+        'INSERT INTO product (id, sku, name, category_id, price, active, image_data) ' +
+        'VALUES (:id, :sku, :name, :category_id, :price, :active, :image)';
+      Insert.Params.ArraySize := CRowCount;
+      for I := 0 to CRowCount - 1 do
+      begin
+        Insert.ParamByName('id').AsLargeInts[I] := 9000000 + I;
+        Insert.ParamByName('sku').AsStrings[I] := Format('BM05-%.3d', [I]);
+        Insert.ParamByName('name').AsStrings[I] := Format('BLOB %.3d', [I]);
+        Insert.ParamByName('category_id').AsLargeInts[I] := 1;
+        Insert.ParamByName('price').AsCurrencys[I] := 1;
+        Insert.ParamByName('active').AsBooleans[I] := True;
+        Input.Position := 0;
+        Insert.ParamByName('image').LoadFromStream(Input, ftBlob, I);
+      end;
+      Insert.Execute(CRowCount, 0);
+
+      Query.Connection := Connection;
+      Query.FetchOptions.Mode := fmOnDemand;
+      Query.FetchOptions.RowsetSize := 16;
+      Query.FetchOptions.RecordCountMode := cmFetched;
+      if SameText(AMode, 'immediate') then
+        Query.FetchOptions.Items := Query.FetchOptions.Items + [fiBlobs]
+      else
+        Query.FetchOptions.Items := Query.FetchOptions.Items - [fiBlobs];
+      Query.SQL.Text := 'SELECT id, image_data FROM product ' +
+        'WHERE id BETWEEN 9000000 AND 9000099 ORDER BY id';
+
+      BytesRead := 0;
+      MemoryBefore := CurrentWorkingSet;
+      Timer := TStopwatch.StartNew;
+      Query.Open;
+      OpenUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      Query.FetchAll;
+      Rows := Query.RecordCount;
+      Query.First;
+      while not Query.Eof do
+      begin
+        if SameText(AMode, 'stream') then
+        begin
+          BlobStream := Query.CreateBlobStream(Query.FieldByName('image_data'), bmRead);
+          try
+            repeat
+              N := BlobStream.Read(Buffer, SizeOf(Buffer));
+              Inc(BytesRead, N);
+            until N = 0;
+          finally
+            BlobStream.Free;
+          end;
+        end
+        else
+          Inc(BytesRead, TBlobField(Query.FieldByName('image_data')).BlobSize);
+        Query.Next;
+      end;
+      TotalUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      MemoryAfter := CurrentWorkingSet;
+      Check(Rows = CRowCount, 'BM-05 não recebeu cem linhas.');
+      Check(BytesRead = Int64(CRowCount) * CBlobSize,
+        'BM-05 não materializou todos os bytes esperados.');
+      Writeln(Format('BM-05 mode=%s rows=%d blob_size=%d open_us=%d total_us=%d ' +
+        'bytes=%d memory_delta=%d', [AMode, Rows, CBlobSize, OpenUs, TotalUs,
+        BytesRead, Int64(MemoryAfter) - Int64(MemoryBefore)]));
+    finally
+      if Connection.InTransaction then
+        Connection.Rollback;
+    end;
+  finally
+    Query.Free;
+    Insert.Free;
+    Input.Free;
+    Connection.Free;
+    Link.Free;
+  end;
+end;
+
 function SlowCommandSql: string;
 begin
   if IsFirebird then
@@ -403,7 +512,8 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter09Checks ondemand|all|blob|cancel|feedback');
+  Writeln('Uso: Chapter09Checks ondemand|all|blob|cancel|feedback|' +
+    'benchmark-blob-immediate|benchmark-blob-deferred|benchmark-blob-stream');
 end;
 
 begin
@@ -423,6 +533,12 @@ begin
       RunCancellation
     else if SameText(ParamStr(1), 'feedback') then
       RunFeedback
+    else if SameText(ParamStr(1), 'benchmark-blob-immediate') then
+      RunBlobBenchmark('immediate')
+    else if SameText(ParamStr(1), 'benchmark-blob-deferred') then
+      RunBlobBenchmark('deferred')
+    else if SameText(ParamStr(1), 'benchmark-blob-stream') then
+      RunBlobBenchmark('stream')
     else
     begin
       ShowUsage;
