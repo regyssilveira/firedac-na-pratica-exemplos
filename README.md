@@ -10,7 +10,7 @@ ao banco às técnicas avançadas com Delphi**, de Regys Silveira.
 ## Linha de base
 
 - RAD Studio 13 Florence / Delphi 37.0;
-- Windows 64-bit e VCL como plataforma principal;
+- um único código-fonte para Windows 32-bit e Windows 64-bit, ambos validados;
 - Firebird 5.0.x como SGBD principal;
 - PostgreSQL 18.x, SQLite embutido e MySQL 8.4 LTS como laboratórios complementares.
 
@@ -36,6 +36,11 @@ Nunca envie senhas, certificados privados, bancos pessoais, dumps de produção 
 arquivos `.env`. Use os modelos versionados e forneça segredos apenas em execução.
 
 ## Win32 e Win64
+
+O repositório usa um perfil de fonte independente de arquitetura: não é preciso
+alterar o código para escolher Win32 ou Win64. Delphi, porém, gera um binário nativo
+por alvo; não existe executável Windows `AnyCPU`. Distribua a pasta Win32, a Win64 ou
+ambas, conforme o público.
 
 Os perfis Firebird suportam os dois alvos a partir do mesmo código. Execute
 `scripts/install-firebird-clients.ps1 -Architecture Both`; o script baixa os kits
