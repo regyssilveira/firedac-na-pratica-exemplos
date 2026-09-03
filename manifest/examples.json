@@ -525,36 +525,36 @@
       "id": "EX-12-01",
       "chapter": 12,
       "title": "Procedure com entrada e saída",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-12/evidence/README.md"]
     },
     {
       "id": "EX-12-02",
       "chapter": 12,
       "title": "Função escalar e tabular",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-12/evidence/README.md"]
     },
     {
       "id": "EX-12-03",
       "chapter": 12,
       "title": "Múltiplos resultados suportados",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-12/evidence/README.md"]
     },
     {
       "id": "EX-12-04",
       "chapter": 12,
       "title": "Fechamento de pedido no servidor",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-12/evidence/README.md"]
     },
     {
       "id": "EX-12-05",
       "chapter": 12,
       "title": "Evento do banco na aplicação",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-12/evidence/README.md"]
     },
     {
       "id": "EX-13-01",

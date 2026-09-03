@@ -30,6 +30,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON sales_order_item TO USER $AppUser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON inventory TO USER $AppUser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON outbox_event TO USER $AppUser;
 GRANT EXECUTE ON PROCEDURE benchmark_product_rows TO USER $AppUser;
+GRANT EXECUTE ON FUNCTION order_total TO USER $AppUser;
+GRANT EXECUTE ON PROCEDURE get_order_state TO USER $AppUser;
+GRANT EXECUTE ON PROCEDURE order_lines TO USER $AppUser;
+GRANT EXECUTE ON PROCEDURE close_order TO USER $AppUser;
 COMMIT;
 "@
 $grantSql | & $resolvedIsql -b -quiet
