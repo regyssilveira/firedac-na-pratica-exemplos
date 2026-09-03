@@ -19,3 +19,9 @@ Comando reproduzível: `scripts/validate-chapter-01.ps1`.
 
 Os quatro projetos nativos — console e VCL em cada arquitetura — foram recompilados
 antes dos testes. Binários, bancos e credenciais permaneceram fora do repositório.
+
+## Revisão contra o manuscrito
+
+Os resultados foram confrontados com o Capítulo 1. A revisão incorporou ao texto a
+necessidade de registrar `FireDAC.DApt` e `FireDAC.VCLUI.Wait`, além de distinguir
+`EFDException` de `EFDDBEngineException` na falha anterior ao contato com o SGBD.
