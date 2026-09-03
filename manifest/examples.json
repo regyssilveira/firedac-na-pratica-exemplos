@@ -110,36 +110,46 @@
       "id": "EX-04-01",
       "chapter": 4,
       "title": "Bootstrap do FireStore",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "manifest/evidence/M0/README.md"
+      ]
     },
     {
       "id": "EX-04-02",
       "chapter": 4,
       "title": "Migração versionada e idempotente",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "manifest/evidence/M0/README.md"
+      ]
     },
     {
       "id": "EX-04-03",
       "chapter": 4,
       "title": "Configuração por variável de ambiente",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "manifest/evidence/M0/README.md"
+      ]
     },
     {
       "id": "EX-04-04",
       "chapter": 4,
       "title": "Health check de banco",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "manifest/evidence/M0/README.md"
+      ]
     },
     {
       "id": "EX-04-05",
       "chapter": 4,
       "title": "Teste de integração descartável",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "manifest/evidence/M0/README.md"
+      ]
     },
     {
       "id": "EX-05-01",

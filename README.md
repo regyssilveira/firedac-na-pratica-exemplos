@@ -3,9 +3,9 @@
 Repositório público dos exemplos do livro **FireDAC na Prática: Do primeiro acesso
 ao banco às técnicas avançadas com Delphi**, de Regys Silveira.
 
-> Estado: preparação editorial. Os exemplos ainda não representam uma edição
-> publicada do livro. Consulte o manifesto antes de assumir que um projeto foi
-> compilado ou executado.
+> Estado: preparação editorial. O FireStore M0 já possui evidência executável;
+> os demais exemplos ainda não representam uma edição publicada do livro. Consulte
+> o manifesto antes de assumir que um projeto foi compilado ou executado.
 
 ## Linha de base
 

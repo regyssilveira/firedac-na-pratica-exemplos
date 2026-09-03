@@ -17,7 +17,9 @@ if ($target -gt ($current + 1)) { throw "Transição inválida: $($example.statu
 if (($target -gt 0) -and [string]::IsNullOrWhiteSpace($Evidence)) {
   throw 'Informe -Evidence para avançar o estado.'
 }
-if ($Evidence) { $example.evidence = @($example.evidence) + $Evidence }
+if ($Evidence -and (@($example.evidence) -notcontains $Evidence)) {
+  $example.evidence = @($example.evidence) + $Evidence
+}
 $example.status = $Status
 $data | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $Manifest -Encoding utf8
 & "$PSScriptRoot\validate-manifest.ps1" -Manifest $Manifest
