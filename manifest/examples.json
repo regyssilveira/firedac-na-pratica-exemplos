@@ -1,0 +1,775 @@
+{
+  "schemaVersion": 1,
+  "examples": [
+    {
+      "id": "EX-01-01",
+      "chapter": 1,
+      "title": "Primeira conexão Firebird em VCL",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-01-02",
+      "chapter": 1,
+      "title": "Primeira conexão SQLite sem servidor",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-01-03",
+      "chapter": 1,
+      "title": "Consulta parametrizada de produto",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-01-04",
+      "chapter": 1,
+      "title": "Conexão no designer versus código",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-01-05",
+      "chapter": 1,
+      "title": "Biblioteca cliente ausente",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-02-01",
+      "chapter": 2,
+      "title": "Fluxo visual dos componentes FireDAC",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-02-02",
+      "chapter": 2,
+      "title": "DataModule compartilhado por dois forms",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-02-03",
+      "chapter": 2,
+      "title": "Mesmo núcleo em VCL e console",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-02-04",
+      "chapter": 2,
+      "title": "DriverLink explícito e registro automático",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-02-05",
+      "chapter": 2,
+      "title": "Relatório de capacidades do driver",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-03-01",
+      "chapter": 3,
+      "title": "Definição temporária em código",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-03-02",
+      "chapter": 3,
+      "title": "Definição persistente em arquivo",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-03-03",
+      "chapter": 3,
+      "title": "Firebird local, remoto e alias",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-03-04",
+      "chapter": 3,
+      "title": "PostgreSQL com PGAdvanced",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-03-05",
+      "chapter": 3,
+      "title": "Seleção dev/teste/produção",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-04-01",
+      "chapter": 4,
+      "title": "Bootstrap do FireStore",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-04-02",
+      "chapter": 4,
+      "title": "Migração versionada e idempotente",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-04-03",
+      "chapter": 4,
+      "title": "Configuração por variável de ambiente",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-04-04",
+      "chapter": 4,
+      "title": "Health check de banco",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-04-05",
+      "chapter": 4,
+      "title": "Teste de integração descartável",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-05-01",
+      "chapter": 5,
+      "title": "Lista com TFDQuery",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-05-02",
+      "chapter": 5,
+      "title": "DML com ExecSQL",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-05-03",
+      "chapter": 5,
+      "title": "Comando reutilizável com TFDCommand",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-05-04",
+      "chapter": 5,
+      "title": "Chave gerada por SGBD",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-05-05",
+      "chapter": 5,
+      "title": "Paginação determinística",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-06-01",
+      "chapter": 6,
+      "title": "Busca com parâmetros opcionais",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-06-02",
+      "chapter": 6,
+      "title": "Macro estrutural com allowlist",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-06-03",
+      "chapter": 6,
+      "title": "Datas, horários e fusos",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-06-04",
+      "chapter": 6,
+      "title": "BLOB por stream",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-06-05",
+      "chapter": 6,
+      "title": "Matriz de tipos entre SGBDs",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-07-01",
+      "chapter": 7,
+      "title": "Locate simples e composto",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-07-02",
+      "chapter": 7,
+      "title": "Filtro por expressão",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-07-03",
+      "chapter": 7,
+      "title": "OnFilterRecord",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-07-04",
+      "chapter": 7,
+      "title": "Índice local composto",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-07-05",
+      "chapter": 7,
+      "title": "Filtrar localmente ou consultar de novo",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-08-01",
+      "chapter": 8,
+      "title": "Campo calculado",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-08-02",
+      "chapter": 8,
+      "title": "Campo lookup",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-08-03",
+      "chapter": 8,
+      "title": "Agregado de itens",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-08-04",
+      "chapter": 8,
+      "title": "Atualização de consulta com join",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-08-05",
+      "chapter": 8,
+      "title": "TFDUpdateSQL explícito",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-09-01",
+      "chapter": 9,
+      "title": "Fetch sob demanda",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-09-02",
+      "chapter": 9,
+      "title": "Fetch completo",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-09-03",
+      "chapter": 9,
+      "title": "BLOB sob demanda",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-09-04",
+      "chapter": 9,
+      "title": "Consulta cancelável",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-09-05",
+      "chapter": 9,
+      "title": "Feedback VCL responsivo",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-10-01",
+      "chapter": 10,
+      "title": "Commit de pedido completo",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-10-02",
+      "chapter": 10,
+      "title": "Rollback por falha no detalhe",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-10-03",
+      "chapter": 10,
+      "title": "Transação aninhada/savepoint",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-10-04",
+      "chapter": 10,
+      "title": "Quatro níveis de isolamento",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-10-05",
+      "chapter": 10,
+      "title": "Unidade transacional reutilizável",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-01",
+      "chapter": 11,
+      "title": "Mestre-detalhe por parâmetros",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-02",
+      "chapter": 11,
+      "title": "Mestre-detalhe por ranges",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-03",
+      "chapter": 11,
+      "title": "Inclusão com chave gerada",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-04",
+      "chapter": 11,
+      "title": "Cascata local e no servidor",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-05",
+      "chapter": 11,
+      "title": "TFDSchemaAdapter atômico",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-06",
+      "chapter": 11,
+      "title": "Cache de detalhes com fiDetails",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-07",
+      "chapter": 11,
+      "title": "DetailDelay e navegação rápida",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-08",
+      "chapter": 11,
+      "title": "Chave composta e DetailFields",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-09",
+      "chapter": 11,
+      "title": "Mestre novo com vários detalhes",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-11-10",
+      "chapter": 11,
+      "title": "Conflito, rollback e nova tentativa",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-12-01",
+      "chapter": 12,
+      "title": "Procedure com entrada e saída",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-12-02",
+      "chapter": 12,
+      "title": "Função escalar e tabular",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-12-03",
+      "chapter": 12,
+      "title": "Múltiplos resultados suportados",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-12-04",
+      "chapter": 12,
+      "title": "Fechamento de pedido no servidor",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-12-05",
+      "chapter": 12,
+      "title": "Evento do banco na aplicação",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-13-01",
+      "chapter": 13,
+      "title": "Array DML de produtos",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-13-02",
+      "chapter": 13,
+      "title": "Erro parcial em lote",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-13-03",
+      "chapter": 13,
+      "title": "Batch Move CSV para banco",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-13-04",
+      "chapter": 13,
+      "title": "Transferência entre dois SGBDs",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-13-05",
+      "chapter": 13,
+      "title": "Benchmark linha a linha versus lote",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-14-01",
+      "chapter": 14,
+      "title": "MemTable criado por campos",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-14-02",
+      "chapter": 14,
+      "title": "CopyDataSet seletivo",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-14-03",
+      "chapter": 14,
+      "title": "CloneCursor",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-14-04",
+      "chapter": 14,
+      "title": "Mestre-detalhe em memória",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-14-05",
+      "chapter": 14,
+      "title": "Dataset aninhado",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-15-01",
+      "chapter": 15,
+      "title": "Round-trip binário",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-15-02",
+      "chapter": 15,
+      "title": "Round-trip XML",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-15-03",
+      "chapter": 15,
+      "title": "JSON FireDAC versus JSON livre",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-15-04",
+      "chapter": 15,
+      "title": "Persistência automática com backup",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-15-05",
+      "chapter": 15,
+      "title": "Cache versionado e arquivo corrompido",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-16-01",
+      "chapter": 16,
+      "title": "Cached Updates descentralizado",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-16-02",
+      "chapter": 16,
+      "title": "Undo, savepoint e cancelamento",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-16-03",
+      "chapter": 16,
+      "title": "Conflito otimista",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-16-04",
+      "chapter": 16,
+      "title": "Aplicação em transação",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-16-05",
+      "chapter": 16,
+      "title": "Cache centralizado mestre-detalhe",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-17-01",
+      "chapter": 17,
+      "title": "Local SQL sobre MemTable",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-17-02",
+      "chapter": 17,
+      "title": "Join entre dataset e CSV",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-17-03",
+      "chapter": 17,
+      "title": "Duas conexões em um Local SQL",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-17-04",
+      "chapter": 17,
+      "title": "Agregação sobre cache",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-17-05",
+      "chapter": 17,
+      "title": "Limites de função/dialeto local",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-18-01",
+      "chapter": 18,
+      "title": "Monitor de round trips",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-18-02",
+      "chapter": 18,
+      "title": "Prepare versus execução ad hoc",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-18-03",
+      "chapter": 18,
+      "title": "Fetch options comparadas",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-18-04",
+      "chapter": 18,
+      "title": "Plano de execução do SGBD",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-18-05",
+      "chapter": 18,
+      "title": "Relatório técnico automático",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-19-01",
+      "chapter": 19,
+      "title": "amAsync com espera",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-19-02",
+      "chapter": 19,
+      "title": "Cancelamento assíncrono",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-19-03",
+      "chapter": 19,
+      "title": "TTask com conexão própria",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-19-04",
+      "chapter": 19,
+      "title": "Pool sob concorrência",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-19-05",
+      "chapter": 19,
+      "title": "Falha e esgotamento do pool",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-20-01",
+      "chapter": 20,
+      "title": "Listagem de catálogos/schemas/tabelas",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-20-02",
+      "chapter": 20,
+      "title": "Campos, chaves e índices",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-20-03",
+      "chapter": 20,
+      "title": "Procedures e parâmetros",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-20-04",
+      "chapter": 20,
+      "title": "Mini Database Explorer",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-20-05",
+      "chapter": 20,
+      "title": "Eventos e automação",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-21-01",
+      "chapter": 21,
+      "title": "Perda e restauração de conexão",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-21-02",
+      "chapter": 21,
+      "title": "Retry idempotente",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-21-03",
+      "chapter": 21,
+      "title": "TLS com validação e falhas",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-21-04",
+      "chapter": 21,
+      "title": "Pacote Win32/Win64 em máquina limpa",
+      "status": "PL",
+      "evidence": []
+    },
+    {
+      "id": "EX-21-05",
+      "chapter": 21,
+      "title": "FireStore integrado",
+      "status": "PL",
+      "evidence": []
+    }
+  ]
+}

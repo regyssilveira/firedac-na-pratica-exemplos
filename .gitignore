@@ -1,0 +1,36 @@
+# Delphi
+*.dcu
+*.exe
+*.dll
+*.bpl
+*.dcp
+*.map
+*.local
+*.identcache
+*.stat
+__history/
+Win32/
+Win64/
+
+# Bancos, dados e segredos
+*.fdb
+*.db
+*.sqlite
+*.sqlite3
+*.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# IDE e sistema
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Evidências geradas localmente
+artifacts/
+reports/local/

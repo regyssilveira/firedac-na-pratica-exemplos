@@ -1,0 +1,14 @@
+name: Validate examples manifest
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  manifest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate manifest
+        shell: pwsh
+        run: ./scripts/validate-manifest.ps1
