@@ -230,36 +230,46 @@
       "id": "EX-06-01",
       "chapter": 6,
       "title": "Busca com parâmetros opcionais",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-06/evidence/README.md"
+      ]
     },
     {
       "id": "EX-06-02",
       "chapter": 6,
       "title": "Macro estrutural com allowlist",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-06/evidence/README.md"
+      ]
     },
     {
       "id": "EX-06-03",
       "chapter": 6,
       "title": "Datas, horários e fusos",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-06/evidence/README.md"
+      ]
     },
     {
       "id": "EX-06-04",
       "chapter": 6,
       "title": "BLOB por stream",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-06/evidence/README.md"
+      ]
     },
     {
       "id": "EX-06-05",
       "chapter": 6,
       "title": "Matriz de tipos entre SGBDs",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-06/evidence/README.md"
+      ]
     },
     {
       "id": "EX-07-01",
