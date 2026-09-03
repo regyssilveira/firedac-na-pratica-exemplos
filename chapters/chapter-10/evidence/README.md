@@ -71,5 +71,12 @@ retry. A matriz não substitui documentação do SGBD nem teste da carga real. E
 limites permanecem explícitos no manuscrito e nos capítulos de concorrência e
 recuperação.
 
-EX-10-01 a EX-10-05 possuem implementação, compilação e execução comprovadas. A
-promoção a `RV` depende do confronto final entre resultados, fonte e capítulo.
+## Revisão contra o manuscrito
+
+Fonte, esquema, saídas e Capítulo 10 foram confrontados. O texto agora exige os quatro
+efeitos da unidade de pedido, distingue constraint nativa de exceção de controle,
+descreve nesting como savepoint e publica a matriz efetivamente observada. O helper
+expõe ownership e foi revisado nos três caminhos executados.
+
+EX-10-01 a EX-10-05 podem avançar a `RV`. As limitações sobre retaining, deadlock,
+retry, perda de rede e generalização de isolamento permanecem explícitas.
