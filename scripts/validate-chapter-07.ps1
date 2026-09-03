@@ -54,17 +54,31 @@ foreach ($architecture in @('Win32', 'Win64')) {
   }
 }
 
-$architecture = 'Win64'
-$env:FIRESTORE_FBCLIENT =
-  (Resolve-Path ".deps\firebird\$architecture\fbclient.dll").Path
-$sqliteDatabase = Get-ChildItem ".deps\firestore\m0-*-$architecture.sqlite" |
-  Sort-Object LastWriteTime -Descending | Select-Object -First 1
-$env:CH07_SQLITE_DATABASE = $sqliteDatabase.FullName
-$executable = ".deps\build\$architecture\chapter-07\Chapter07Checks.exe"
-foreach ($driver in @('SQLite', 'FB')) {
-  $env:CH07_DRIVER = $driver
-  & $executable benchmark
-  if ($LASTEXITCODE -ne 0) { throw "BM-04/$driver/$architecture falhou." }
+$bm04 = [System.Collections.Generic.List[string]]::new()
+$bm04.Add('benchmark_id,architecture,driver,repetition,rows,local_fetch_ms,local_filter_ms,remote_ms,result_rows')
+foreach ($architecture in @('Win32', 'Win64')) {
+  $env:FIRESTORE_FBCLIENT =
+    (Resolve-Path ".deps\firebird\$architecture\fbclient.dll").Path
+  $sqliteDatabase = Get-ChildItem ".deps\firestore\m0-*-$architecture.sqlite" |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  $env:CH07_SQLITE_DATABASE = $sqliteDatabase.FullName
+  $executable = ".deps\build\$architecture\chapter-07\Chapter07Checks.exe"
+  foreach ($driver in @('SQLite', 'FB')) {
+    $env:CH07_DRIVER = $driver
+    $warmup = & $executable benchmark
+    if ($LASTEXITCODE -ne 0) { throw "Aquecimento BM-04/$driver/$architecture falhou." }
+    for ($rep = 1; $rep -le 5; $rep++) {
+      $lines = & $executable benchmark
+      if ($LASTEXITCODE -ne 0) { throw "BM-04/$driver/$architecture/repetição $rep falhou." }
+      foreach ($line in $lines) {
+        if ($line -notmatch '^BM-04 rows=(\d+) local_fetch_ms=(\d+) local_filter_ms=(\d+) remote_ms=(\d+) result_rows=(\d+)$') {
+          throw "Saída BM-04 inválida: $line"
+        }
+        $bm04.Add("BM-04,$architecture,$driver,$rep,$($Matches[1]),$($Matches[2]),$($Matches[3]),$($Matches[4]),$($Matches[5])")
+      }
+    }
+  }
 }
+$bm04 | Set-Content 'chapters\chapter-07\evidence\bm-04-raw.csv' -Encoding utf8
 
-Write-Output 'Capítulo 7 aprovado; BM-04 executado em Win64 nos dois bancos.'
+Write-Output 'Capítulo 7 aprovado; BM-04 normalizado em SQLite/Firebird, Win32/Win64.'

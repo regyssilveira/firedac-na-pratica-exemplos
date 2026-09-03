@@ -28,18 +28,26 @@ ids, `1,2`, antes de qualquer interpretação de custo.
 
 ## BM-04 — observação controlada
 
-BM-04 foi executado em Win64. Cada fonte gerou ids sequenciais, dez categorias e
-seletividade exata de 10%. O caminho local mediu fetch completo e aplicação do filtro
-separadamente; o remoto mediu geração e fetch apenas das linhas aceitas.
+BM-04 foi executado em Win32 e Win64. Cada fonte gerou ids sequenciais, dez categorias
+e seletividade exata de 10%. O caminho local mediu fetch completo e aplicação do
+filtro separadamente; o remoto mediu geração e fetch apenas das linhas aceitas. Um
+aquecimento foi descartado e o CSV conserva cinco repetições por perfil e massa, num
+total de 60 observações. A tabela apresenta medianas.
 
-| Banco | Linhas | Fetch local (ms) | Filtro local (ms) | Remoto (ms) | Resultado |
+| Perfil | Linhas | Fetch local (ms) | Filtro local (ms) | Remoto (ms) | Resultado |
 |---|---:|---:|---:|---:|---:|
-| SQLite | 100 | 0 | 0 | 0 | 10 |
-| SQLite | 10.000 | 4 | 2 | 1 | 1.000 |
-| SQLite | 1.000.000 | 572 | 289 | 220 | 100.000 |
-| Firebird | 100 | 7 | 0 | 2 | 10 |
-| Firebird | 10.000 | 66 | 3 | 40 | 1.000 |
-| Firebird | 1.000.000 | 6.535 | 541 | 3.639 | 100.000 |
+| SQLite Win32 | 100 | 0 | 0 | 0 | 10 |
+| SQLite Win32 | 10.000 | 7 | 4 | 3 | 1.000 |
+| SQLite Win32 | 1.000.000 | 727 | 358 | 262 | 100.000 |
+| Firebird Win32 | 100 | 5 | 0 | 1 | 10 |
+| Firebird Win32 | 10.000 | 65 | 4 | 38 | 1.000 |
+| Firebird Win32 | 1.000.000 | 6.421 | 373 | 3.611 | 100.000 |
+| SQLite Win64 | 100 | 0 | 0 | 0 | 10 |
+| SQLite Win64 | 10.000 | 5 | 2 | 2 | 1.000 |
+| SQLite Win64 | 1.000.000 | 566 | 273 | 207 | 100.000 |
+| Firebird Win64 | 100 | 4 | 0 | 1 | 10 |
+| Firebird Win64 | 10.000 | 65 | 3 | 37 | 1.000 |
+| Firebird Win64 | 1.000.000 | 6.459 | 302 | 3.613 | 100.000 |
 
 SQLite usou CTE recursiva; Firebird usou a selectable procedure
 `benchmark_product_rows`. Portanto, os números não comparam os bancos entre si. Em
@@ -59,10 +67,11 @@ ensaio, eliminando dependência da code page do compilador.
 
 ## Limites
 
-Os tempos são uma execução de laboratório, sem aquecimento, repetição estatística,
+Os tempos são observações de laboratório com aquecimento e cinco repetições, mas sem
 contagem de bytes no fio ou medição de memória. A massa é sintética, e o filtro remoto
 não usa uma tabela persistente indexada. BM-04 sustenta a discussão de escala e
-transferência, mas não publica um vencedor universal nem números de capacidade.
+transferência, mas não publica um vencedor universal nem números de capacidade. Os
+dois SGBDs usam geradores diferentes e não devem ser comparados entre si.
 
 ## Revisão contra o manuscrito
 
@@ -71,5 +80,6 @@ bookmark ao mesmo snapshot, trata `Lookup` múltiplo como array, explica o prefi
 range, adapta booleanos por driver e só compara tempos dentro do mesmo gerador.
 
 EX-07-01 a EX-07-05 podem avançar a `RV`. Todos possuem asserções nos quatro perfis.
-BM-04 sustenta somente equivalência, seletividade e tempos da execução registrada;
-memória, bytes, primeira linha e estatística não foram promovidos como resultados.
+BM-04 sustenta equivalência, seletividade e as medianas registradas; memória, bytes e
+tempo de primeira linha não foram promovidos como resultados. Os dados brutos estão
+em `bm-04-raw.csv`.

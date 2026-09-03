@@ -19,5 +19,6 @@ no servidor. Os tempos são observações do laboratório, não promessas de des
 ```
 
 Os cinco exemplos funcionais usam o mesmo fonte em Win32/Win64 e SQLite/Firebird.
-BM-04 é executado em Win64 nos dois bancos para evitar tratar arquitetura como
-variável de desempenho sem um protocolo próprio.
+BM-04 descarta um aquecimento e registra cinco repetições nos quatro perfis. Os dados
+brutos ficam em `evidence/bm-04-raw.csv`; arquitetura continua sendo contexto da
+medição, não explicação causal automática para diferenças.
