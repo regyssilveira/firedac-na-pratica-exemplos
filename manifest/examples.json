@@ -365,36 +365,46 @@
       "id": "EX-09-01",
       "chapter": 9,
       "title": "Fetch sob demanda",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-09/evidence/README.md"
+      ]
     },
     {
       "id": "EX-09-02",
       "chapter": 9,
       "title": "Fetch completo",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-09/evidence/README.md"
+      ]
     },
     {
       "id": "EX-09-03",
       "chapter": 9,
       "title": "BLOB sob demanda",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-09/evidence/README.md"
+      ]
     },
     {
       "id": "EX-09-04",
       "chapter": 9,
       "title": "Consulta cancelável",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-09/evidence/README.md"
+      ]
     },
     {
       "id": "EX-09-05",
       "chapter": 9,
       "title": "Feedback VCL responsivo",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-09/evidence/README.md"
+      ]
     },
     {
       "id": "EX-10-01",
