@@ -230,7 +230,7 @@
       "id": "EX-06-01",
       "chapter": 6,
       "title": "Busca com parâmetros opcionais",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-06/evidence/README.md"
       ]
@@ -239,7 +239,7 @@
       "id": "EX-06-02",
       "chapter": 6,
       "title": "Macro estrutural com allowlist",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-06/evidence/README.md"
       ]
@@ -248,7 +248,7 @@
       "id": "EX-06-03",
       "chapter": 6,
       "title": "Datas, horários e fusos",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-06/evidence/README.md"
       ]
@@ -257,7 +257,7 @@
       "id": "EX-06-04",
       "chapter": 6,
       "title": "BLOB por stream",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-06/evidence/README.md"
       ]
@@ -266,7 +266,7 @@
       "id": "EX-06-05",
       "chapter": 6,
       "title": "Matriz de tipos entre SGBDs",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-06/evidence/README.md"
       ]

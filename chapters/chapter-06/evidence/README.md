@@ -50,3 +50,15 @@ tipo temporal nativo do SQLite.
 A matriz não prova os tipos de PostgreSQL e MySQL, UUID nativo, datas históricas,
 regras de horário de verão, BLOBs de grande volume nem efeito de filtros opcionais
 nos planos. Esses experimentos permanecem destinados aos capítulos apropriados.
+
+## Revisão contra o manuscrito
+
+O código e a matriz foram confrontados com o Capítulo 6. O texto agora mostra as
+classes concretas por driver, evita recomendar `AsBoolean` para o campo inteiro do
+SQLite, distingue timestamp com offset de texto UTC canônico e informa que o teste de
+8 KiB não comprova comportamento de BLOBs grandes.
+
+EX-06-01 a EX-06-05 podem avançar a `RV`. Parâmetros opcionais, allowlist, temporal,
+BLOB e tipos possuem asserções executadas nos quatro perfis. Planos de consulta,
+PostgreSQL, MySQL e cenários de alto volume permanecem explicitamente fora do estado
+revisado deste capítulo.
