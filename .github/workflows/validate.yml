@@ -8,7 +8,7 @@ jobs:
   manifest:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate manifest
         shell: pwsh
         run: ./scripts/validate-manifest.ps1
