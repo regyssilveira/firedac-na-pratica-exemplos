@@ -410,36 +410,46 @@
       "id": "EX-10-01",
       "chapter": 10,
       "title": "Commit de pedido completo",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-10/evidence/README.md"
+      ]
     },
     {
       "id": "EX-10-02",
       "chapter": 10,
       "title": "Rollback por falha no detalhe",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-10/evidence/README.md"
+      ]
     },
     {
       "id": "EX-10-03",
       "chapter": 10,
       "title": "Transação aninhada/savepoint",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-10/evidence/README.md"
+      ]
     },
     {
       "id": "EX-10-04",
       "chapter": 10,
       "title": "Quatro níveis de isolamento",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-10/evidence/README.md"
+      ]
     },
     {
       "id": "EX-10-05",
       "chapter": 10,
       "title": "Unidade transacional reutilizável",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-10/evidence/README.md"
+      ]
     },
     {
       "id": "EX-11-01",

@@ -180,20 +180,22 @@ end;
 
 procedure SmokeTest(AConnection: TFDConnection);
 var
-  VersionCount, CategoryCount, ProductCount: Integer;
+  VersionCount, CategoryCount, ProductCount, InventoryCount: Integer;
   ProductName: string;
 begin
   VersionCount := AConnection.ExecSQLScalar('SELECT COUNT(*) FROM schema_version');
   CategoryCount := AConnection.ExecSQLScalar('SELECT COUNT(*) FROM category');
   ProductCount := AConnection.ExecSQLScalar('SELECT COUNT(*) FROM product');
+  InventoryCount := AConnection.ExecSQLScalar('SELECT COUNT(*) FROM inventory');
   ProductName := VarToStr(AConnection.ExecSQLScalar(
     'SELECT name FROM product WHERE sku = :sku', ['BEB-001']));
-  if (VersionCount <> 5) or (CategoryCount <> 2) or (ProductCount <> 3) or
+  if (VersionCount <> 7) or (CategoryCount <> 2) or (ProductCount <> 3) or
+     (InventoryCount <> 3) or
      (ProductName <> 'Caf' + #$00E9 + ' especial') then
     raise Exception.CreateFmt(
-      'Smoke test falhou: versões=%d categorias=%d produtos=%d produto=%s',
-      [VersionCount, CategoryCount, ProductCount, ProductName]);
-  Writeln('Smoke test aprovado: 5 migrations, 2 categorias e 3 produtos.');
+      'Smoke test falhou: versões=%d categorias=%d produtos=%d estoque=%d produto=%s',
+      [VersionCount, CategoryCount, ProductCount, InventoryCount, ProductName]);
+  Writeln('Smoke test aprovado: 7 migrations, 2 categorias, 3 produtos e 3 estoques.');
 end;
 
 var
