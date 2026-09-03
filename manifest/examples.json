@@ -75,14 +75,14 @@
       "id": "EX-03-01",
       "chapter": 3,
       "title": "Definição temporária em código",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-03/evidence/README.md"]
     },
     {
       "id": "EX-03-02",
       "chapter": 3,
       "title": "Definição persistente em arquivo",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-03/evidence/README.md"]
     },
     {
@@ -103,7 +103,7 @@
       "id": "EX-03-05",
       "chapter": 3,
       "title": "Seleção dev/teste/produção",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-03/evidence/README.md"]
     },
     {

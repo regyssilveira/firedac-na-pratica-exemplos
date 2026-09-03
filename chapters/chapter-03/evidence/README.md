@@ -38,3 +38,10 @@ havia alias de laboratório configurado. Esses dois caminhos não são descritos
 executados.
 
 Binários, bancos, arquivos de definição e credenciais permaneceram fora do Git.
+
+## Revisão contra o manuscrito
+
+EX-03-01, EX-03-02 e EX-03-05 foram confrontados com o Capítulo 3 e podem avançar a
+`RV`. O texto incorporou a chamada explícita a `SaveConnectionDefFile` e separou
+configuração, compilação e sessão autenticada. EX-03-03 e EX-03-04 continuam em `CP`
+até os caminhos remoto/alias e PostgreSQL serem executados.
