@@ -770,36 +770,46 @@
       "id": "EX-17-01",
       "chapter": 17,
       "title": "Local SQL sobre MemTable",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-17/evidence/README.md"
+      ]
     },
     {
       "id": "EX-17-02",
       "chapter": 17,
       "title": "Join entre dataset e CSV",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-17/evidence/README.md"
+      ]
     },
     {
       "id": "EX-17-03",
       "chapter": 17,
       "title": "Duas conexões em um Local SQL",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-17/evidence/README.md"
+      ]
     },
     {
       "id": "EX-17-04",
       "chapter": 17,
       "title": "Agregação sobre cache",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-17/evidence/README.md"
+      ]
     },
     {
       "id": "EX-17-05",
       "chapter": 17,
       "title": "Limites de função/dialeto local",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-17/evidence/README.md"
+      ]
     },
     {
       "id": "EX-18-01",
