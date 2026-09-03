@@ -4,6 +4,7 @@ program FireStoreBootstrap;
 
 uses
   System.SysUtils,
+  System.Classes,
   System.Variants,
   System.IOUtils,
   System.Hash,
@@ -105,7 +106,22 @@ end;
 procedure ExecuteScript(AConnection: TFDConnection; const AFileName: string);
 var
   Script: TFDScript;
+  SingleCommand: TStringList;
 begin
+  SingleCommand := TStringList.Create;
+  try
+    SingleCommand.LoadFromFile(AFileName, TEncoding.UTF8);
+    if (SingleCommand.Count > 0) and
+       SameText(Trim(SingleCommand[0]), '-- FIRESTORE:SINGLE-COMMAND') then
+    begin
+      SingleCommand.Delete(0);
+      AConnection.ExecSQL(SingleCommand.Text);
+      Exit;
+    end;
+  finally
+    SingleCommand.Free;
+  end;
+
   Script := TFDScript.Create(nil);
   try
     Script.Connection := AConnection;
@@ -172,12 +188,12 @@ begin
   ProductCount := AConnection.ExecSQLScalar('SELECT COUNT(*) FROM product');
   ProductName := VarToStr(AConnection.ExecSQLScalar(
     'SELECT name FROM product WHERE sku = :sku', ['BEB-001']));
-  if (VersionCount <> 4) or (CategoryCount <> 2) or (ProductCount <> 3) or
+  if (VersionCount <> 5) or (CategoryCount <> 2) or (ProductCount <> 3) or
      (ProductName <> 'Caf' + #$00E9 + ' especial') then
     raise Exception.CreateFmt(
       'Smoke test falhou: versões=%d categorias=%d produtos=%d produto=%s',
       [VersionCount, CategoryCount, ProductCount, ProductName]);
-  Writeln('Smoke test aprovado: 4 migrations, 2 categorias e 3 produtos.');
+  Writeln('Smoke test aprovado: 5 migrations, 2 categorias e 3 produtos.');
 end;
 
 var

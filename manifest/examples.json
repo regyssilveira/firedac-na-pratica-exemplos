@@ -275,36 +275,46 @@
       "id": "EX-07-01",
       "chapter": 7,
       "title": "Locate simples e composto",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-07/evidence/README.md"
+      ]
     },
     {
       "id": "EX-07-02",
       "chapter": 7,
       "title": "Filtro por expressão",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-07/evidence/README.md"
+      ]
     },
     {
       "id": "EX-07-03",
       "chapter": 7,
       "title": "OnFilterRecord",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-07/evidence/README.md"
+      ]
     },
     {
       "id": "EX-07-04",
       "chapter": 7,
       "title": "Índice local composto",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-07/evidence/README.md"
+      ]
     },
     {
       "id": "EX-07-05",
       "chapter": 7,
       "title": "Filtrar localmente ou consultar de novo",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-07/evidence/README.md"
+      ]
     },
     {
       "id": "EX-08-01",

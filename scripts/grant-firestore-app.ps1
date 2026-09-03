@@ -25,6 +25,7 @@ CONNECT '$safeServerDatabase' USER $AdminUser PASSWORD '$safeAdminPassword';
 GRANT SELECT, INSERT, UPDATE, DELETE ON schema_version TO USER $AppUser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON category TO USER $AppUser;
 GRANT SELECT, INSERT, UPDATE, DELETE ON product TO USER $AppUser;
+GRANT EXECUTE ON PROCEDURE benchmark_product_rows TO USER $AppUser;
 COMMIT;
 "@
 $grantSql | & $resolvedIsql -b -quiet
