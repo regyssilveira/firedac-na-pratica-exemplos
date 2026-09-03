@@ -5,36 +5,36 @@
       "id": "EX-01-01",
       "chapter": 1,
       "title": "Primeira conexão Firebird em VCL",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": ["chapters/chapter-01/evidence/README.md"]
     },
     {
       "id": "EX-01-02",
       "chapter": 1,
       "title": "Primeira conexão SQLite sem servidor",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": ["chapters/chapter-01/evidence/README.md"]
     },
     {
       "id": "EX-01-03",
       "chapter": 1,
       "title": "Consulta parametrizada de produto",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": ["chapters/chapter-01/evidence/README.md"]
     },
     {
       "id": "EX-01-04",
       "chapter": 1,
       "title": "Conexão no designer versus código",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": ["chapters/chapter-01/evidence/README.md"]
     },
     {
       "id": "EX-01-05",
       "chapter": 1,
       "title": "Biblioteca cliente ausente",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": ["chapters/chapter-01/evidence/README.md"]
     },
     {
       "id": "EX-02-01",
