@@ -1,7 +1,9 @@
 # Evidência — FireStore M0
 
-**Data:** 3 de setembro de 2026  
-**RAD Studio:** 13 Florence, compilador 37.0.57242.3601  
+**Data:** 3 de setembro de 2026
+
+**RAD Studio:** 13 Florence, compilador 37.0.57242.3601
+
 **Servidor:** Firebird 5.0.4.1812, TCP 3050
 
 O bootstrap foi compilado como Win32 e Win64 e validado com os seguintes cenários:
