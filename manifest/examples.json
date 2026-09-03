@@ -725,36 +725,46 @@
       "id": "EX-16-01",
       "chapter": 16,
       "title": "Cached Updates descentralizado",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-16/evidence/README.md"
+      ]
     },
     {
       "id": "EX-16-02",
       "chapter": 16,
       "title": "Undo, savepoint e cancelamento",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-16/evidence/README.md"
+      ]
     },
     {
       "id": "EX-16-03",
       "chapter": 16,
       "title": "Conflito otimista",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-16/evidence/README.md"
+      ]
     },
     {
       "id": "EX-16-04",
       "chapter": 16,
       "title": "Aplicação em transação",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-16/evidence/README.md"
+      ]
     },
     {
       "id": "EX-16-05",
       "chapter": 16,
       "title": "Cache centralizado mestre-detalhe",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-16/evidence/README.md"
+      ]
     },
     {
       "id": "EX-17-01",
