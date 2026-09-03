@@ -31,3 +31,10 @@ capacidade crítica ainda precisa de um ensaio próprio.
 
 Os quatro binários foram recompilados antes da execução. Bancos, clientes, resultados
 e credenciais permaneceram fora do repositório.
+
+## Revisão contra o manuscrito
+
+Os resultados foram confrontados com o Capítulo 2. O texto passou a descrever o
+DataModule efetivamente compilado, o uso de `SilentMode` no núcleo não visual, o
+compartilhamento do mesmo dataset por dois formulários e os limites das flags de
+`IFDPhysConnectionMetadata`.

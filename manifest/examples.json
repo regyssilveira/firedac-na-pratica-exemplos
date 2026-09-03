@@ -40,35 +40,35 @@
       "id": "EX-02-01",
       "chapter": 2,
       "title": "Fluxo visual dos componentes FireDAC",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-02/evidence/README.md"]
     },
     {
       "id": "EX-02-02",
       "chapter": 2,
       "title": "DataModule compartilhado por dois forms",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-02/evidence/README.md"]
     },
     {
       "id": "EX-02-03",
       "chapter": 2,
       "title": "Mesmo núcleo em VCL e console",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-02/evidence/README.md"]
     },
     {
       "id": "EX-02-04",
       "chapter": 2,
       "title": "DriverLink explícito e registro automático",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-02/evidence/README.md"]
     },
     {
       "id": "EX-02-05",
       "chapter": 2,
       "title": "Relatório de capacidades do driver",
-      "status": "EX",
+      "status": "RV",
       "evidence": ["chapters/chapter-02/evidence/README.md"]
     },
     {
