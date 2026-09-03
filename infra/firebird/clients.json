@@ -1,0 +1,19 @@
+{
+  "version": "5.0.4.1812",
+  "release": "v5.0.4",
+  "source": "https://www.firebirdsql.org/en/firebird-5-0/",
+  "architectures": {
+    "Win32": {
+      "archive": "Firebird-5.0.4.1812-0-windows-x86.zip",
+      "url": "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.4/Firebird-5.0.4.1812-0-windows-x86.zip",
+      "sha256": "E46747EE167FB0B305BF2A7CEC70964FA2499F58A7E5F89E64FF0EBAC8F4768A",
+      "peMachine": "0x014C"
+    },
+    "Win64": {
+      "archive": "Firebird-5.0.4.1812-0-windows-x64.zip",
+      "url": "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.4/Firebird-5.0.4.1812-0-windows-x64.zip",
+      "sha256": "01E844FCE4D5F53272A76205DBC3A1BA4B782AB8E8EADCD808CDBCCD9CE13B72",
+      "peMachine": "0x8664"
+    }
+  }
+}

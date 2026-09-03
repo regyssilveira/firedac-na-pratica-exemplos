@@ -35,6 +35,13 @@ Somente exemplos em `RV` podem ser apresentados no livro como tecnicamente revis
 Nunca envie senhas, certificados privados, bancos pessoais, dumps de produção ou
 arquivos `.env`. Use os modelos versionados e forneça segredos apenas em execução.
 
+## Win32 e Win64
+
+Os perfis Firebird suportam os dois alvos a partir do mesmo código. Execute
+`scripts/install-firebird-clients.ps1 -Architecture Both`; o script baixa os kits
+oficiais, valida seus hashes e separa os clientes por arquitetura. Consulte
+`infra/firebird/README.md`.
+
 ## Licença
 
 Código autoral distribuído sob a Apache License 2.0. Exemplos ou dependências de
