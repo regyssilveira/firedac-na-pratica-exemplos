@@ -63,3 +63,13 @@ Os tempos são uma execução de laboratório, sem aquecimento, repetição esta
 contagem de bytes no fio ou medição de memória. A massa é sintética, e o filtro remoto
 não usa uma tabela persistente indexada. BM-04 sustenta a discussão de escala e
 transferência, mas não publica um vencedor universal nem números de capacidade.
+
+## Revisão contra o manuscrito
+
+O Capítulo 7 foi confrontado com fonte, asserções e saída de BM-04. O texto limita o
+bookmark ao mesmo snapshot, trata `Lookup` múltiplo como array, explica o prefixo do
+range, adapta booleanos por driver e só compara tempos dentro do mesmo gerador.
+
+EX-07-01 a EX-07-05 podem avançar a `RV`. Todos possuem asserções nos quatro perfis.
+BM-04 sustenta somente equivalência, seletividade e tempos da execução registrada;
+memória, bytes, primeira linha e estatística não foram promovidos como resultados.
