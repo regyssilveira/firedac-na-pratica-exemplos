@@ -79,6 +79,14 @@ carga. O teste não mede latência remota, paginação no servidor, múltiplos r
 nem cancelamento durante cada fase possível de um dataset. Esses cenários devem ser
 avaliados com a consulta e o driver reais da aplicação.
 
-EX-09-01 a EX-09-05 possuem implementação, compilação e execução comprovadas. A
-promoção a `RV` depende ainda do confronto final entre estes resultados e o texto do
-capítulo.
+## Revisão contra o manuscrito
+
+Fonte, saídas, traces e Capítulo 9 foram confrontados. O texto agora distingue cache
+completo de cursor formalmente esgotado, usa `cmFetched` para não perturbar a medição,
+expõe o fetch tardio real do BLOB e separa cancelamento de execução das fases de
+abertura e fetch. Também registra a interferência do monitor e o teardown seguro da
+operação assíncrona.
+
+EX-09-01 a EX-09-05 podem avançar a `RV`. Cada afirmação apresentada como resultado
+possui asserção nos binários correspondentes ou evidência nos quatro traces; os
+limites de benchmark e de generalização entre drivers permanecem explícitos.

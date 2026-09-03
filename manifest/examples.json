@@ -365,7 +365,7 @@
       "id": "EX-09-01",
       "chapter": 9,
       "title": "Fetch sob demanda",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-09/evidence/README.md"
       ]
@@ -374,7 +374,7 @@
       "id": "EX-09-02",
       "chapter": 9,
       "title": "Fetch completo",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-09/evidence/README.md"
       ]
@@ -383,7 +383,7 @@
       "id": "EX-09-03",
       "chapter": 9,
       "title": "BLOB sob demanda",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-09/evidence/README.md"
       ]
@@ -392,7 +392,7 @@
       "id": "EX-09-04",
       "chapter": 9,
       "title": "Consulta cancelável",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-09/evidence/README.md"
       ]
@@ -401,7 +401,7 @@
       "id": "EX-09-05",
       "chapter": 9,
       "title": "Feedback VCL responsivo",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-09/evidence/README.md"
       ]
