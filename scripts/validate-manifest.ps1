@@ -2,7 +2,7 @@ param([string]$Manifest = "$PSScriptRoot\..\manifest\examples.json")
 
 $ErrorActionPreference = 'Stop'
 $data = Get-Content -LiteralPath $Manifest -Raw | ConvertFrom-Json
-$allowed = @('PL', 'IM', 'CP', 'EX', 'RV')
+$allowed = @('PL', 'IM', 'CP', 'EX', 'EC', 'RV')
 $ids = @{}
 $repositoryRoot = (Resolve-Path (Join-Path (Split-Path -Parent $Manifest) '..')).Path
 

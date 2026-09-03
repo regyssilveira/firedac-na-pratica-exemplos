@@ -920,36 +920,36 @@
       "id": "EX-21-01",
       "chapter": 21,
       "title": "Perda e restauração de conexão",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-21/evidence/README.md"]
     },
     {
       "id": "EX-21-02",
       "chapter": 21,
       "title": "Retry idempotente",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-21/evidence/README.md"]
     },
     {
       "id": "EX-21-03",
       "chapter": 21,
       "title": "TLS com validação e falhas",
-      "status": "PL",
-      "evidence": []
+      "status": "EC",
+      "evidence": ["chapters/chapter-21/evidence/README.md"]
     },
     {
       "id": "EX-21-04",
       "chapter": 21,
       "title": "Pacote Win32/Win64 em máquina limpa",
-      "status": "PL",
-      "evidence": []
+      "status": "EC",
+      "evidence": ["chapters/chapter-21/evidence/README.md", "chapters/chapter-21/evidence/deployment-manifest.json"]
     },
     {
       "id": "EX-21-05",
       "chapter": 21,
       "title": "FireStore integrado",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": ["chapters/chapter-21/evidence/README.md"]
     }
   ]
 }

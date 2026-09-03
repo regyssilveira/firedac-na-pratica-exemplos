@@ -28,6 +28,11 @@ Cada exemplo percorre os estados:
 
 `PL` planejado → `IM` implementado → `CP` compilado → `EX` executado → `RV` revisado.
 
+`EC` significa **evidência condicionada**: uma parte relevante já foi executada e
+documentada, mas ainda existe um gate externo explícito — por exemplo, TLS com CA e
+hostname ou implantação em uma máquina limpa. Um exemplo em `EC` não pode ser
+apresentado como integralmente revisado.
+
 Somente exemplos em `RV` podem ser apresentados no livro como tecnicamente revisados.
 
 ## Segurança

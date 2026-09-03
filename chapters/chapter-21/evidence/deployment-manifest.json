@@ -1,0 +1,128 @@
+[
+  {
+    "architecture": "Win32",
+    "file": "Chapter21Checks.exe",
+    "sha256": "156dcb9ee1dc8f5543d5c75155400d21869217b3b87be63abe47ea942f869e5a",
+    "bytes": 3964416,
+    "license": "Book example / Apache-2.0"
+  },
+  {
+    "architecture": "Win32",
+    "file": "fbclient.dll",
+    "sha256": "e9ba227123ec78c8599f27ac1ab6f4f39e90ad5ecf5b16f5a1eed3191b52fffe",
+    "bytes": 1828864,
+    "license": "Firebird IPL/IDPL"
+  },
+  {
+    "architecture": "Win32",
+    "file": "msvcp140.dll",
+    "sha256": "74e9268a68118bb1ac5154f8f327887715960ccc37ba9dabbe31ecd82dcbaa55",
+    "bytes": 448408,
+    "license": "Microsoft Visual C++ Runtime"
+  },
+  {
+    "architecture": "Win32",
+    "file": "msvcp140_1.dll",
+    "sha256": "037da271a83151debaa648a35cf5ce9ee9b8fedaa7e437bee1b44ece54ad9933",
+    "bytes": 33088,
+    "license": "Microsoft Visual C++ Runtime"
+  },
+  {
+    "architecture": "Win32",
+    "file": "vcruntime140.dll",
+    "sha256": "65f620bc588d95fe2ed236d1602e49f89077b434c83102549eed137c7fdc7220",
+    "bytes": 90520,
+    "license": "Microsoft Visual C++ Runtime"
+  },
+  {
+    "architecture": "Win32",
+    "file": "zlib1.dll",
+    "sha256": "6c862faf31a6861d123b57d4586e24fbc779fba29dc0287feef82df17d192c64",
+    "bytes": 78336,
+    "license": "zlib"
+  },
+  {
+    "architecture": "Win32",
+    "file": "plugins/chacha.dll",
+    "sha256": "bebc0fd9904e93117a80d1c628446372d71b7b04f4512e86a685e2fbcf7405b5",
+    "bytes": 394752,
+    "license": "Firebird IPL/IDPL"
+  },
+  {
+    "architecture": "Win32",
+    "file": "licenses/IPLicense.txt",
+    "sha256": "fece7c16035e212cca352512a46791f090ff33e99b2dd7208e8f04f5323106b7",
+    "bytes": 24405,
+    "license": "IPL"
+  },
+  {
+    "architecture": "Win32",
+    "file": "licenses/IDPLicense.txt",
+    "sha256": "a32b842bd833fbf127ef67267383901d0da8f430006030b8cd931221a11e9d56",
+    "bytes": 26519,
+    "license": "IDPL"
+  },
+  {
+    "architecture": "Win64",
+    "file": "Chapter21Checks.exe",
+    "sha256": "19f1875adb1ebfec8f80c9a12f21051a2b0e8041060dfbec8add4a3a298ec43d",
+    "bytes": 6371840,
+    "license": "Book example / Apache-2.0"
+  },
+  {
+    "architecture": "Win64",
+    "file": "fbclient.dll",
+    "sha256": "0b8b81b733820008a0287498912c0a308cfcc35370de8cc4d496538df7aa93a6",
+    "bytes": 2073088,
+    "license": "Firebird IPL/IDPL"
+  },
+  {
+    "architecture": "Win64",
+    "file": "msvcp140.dll",
+    "sha256": "74892d9b4028c05debaf0b9b5d9dc6d22f7956fa7d7eee00c681318c26792823",
+    "bytes": 578384,
+    "license": "Microsoft Visual C++ Runtime"
+  },
+  {
+    "architecture": "Win64",
+    "file": "msvcp140_1.dll",
+    "sha256": "a3a1199de32bbbc8318ec33e2e1ce556247d012851e4b367fe853a51e74ce4ee",
+    "bytes": 35704,
+    "license": "Microsoft Visual C++ Runtime"
+  },
+  {
+    "architecture": "Win64",
+    "file": "vcruntime140.dll",
+    "sha256": "69320f278d90efaaeb67e2a1b55e5b0543883125834c812c8d9c39676e0494fc",
+    "bytes": 109440,
+    "license": "Microsoft Visual C++ Runtime"
+  },
+  {
+    "architecture": "Win64",
+    "file": "zlib1.dll",
+    "sha256": "f6e468c8099479ebef40996af5e2bd38391dfd1de38bcd8b316cd1e2a5edd440",
+    "bytes": 91648,
+    "license": "zlib"
+  },
+  {
+    "architecture": "Win64",
+    "file": "plugins/chacha.dll",
+    "sha256": "2c609da07a1fe7c1e25dc21eab05ca87659ae093373328c62d52c37feefb2549",
+    "bytes": 435712,
+    "license": "Firebird IPL/IDPL"
+  },
+  {
+    "architecture": "Win64",
+    "file": "licenses/IPLicense.txt",
+    "sha256": "fece7c16035e212cca352512a46791f090ff33e99b2dd7208e8f04f5323106b7",
+    "bytes": 24405,
+    "license": "IPL"
+  },
+  {
+    "architecture": "Win64",
+    "file": "licenses/IDPLicense.txt",
+    "sha256": "a32b842bd833fbf127ef67267383901d0da8f430006030b8cd931221a11e9d56",
+    "bytes": 26519,
+    "license": "IDPL"
+  }
+]
