@@ -185,7 +185,7 @@
       "id": "EX-05-01",
       "chapter": 5,
       "title": "Lista com TFDQuery",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-05/evidence/README.md"
       ]
@@ -194,7 +194,7 @@
       "id": "EX-05-02",
       "chapter": 5,
       "title": "DML com ExecSQL",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-05/evidence/README.md"
       ]
@@ -203,7 +203,7 @@
       "id": "EX-05-03",
       "chapter": 5,
       "title": "Comando reutilizável com TFDCommand",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-05/evidence/README.md"
       ]
@@ -212,7 +212,7 @@
       "id": "EX-05-04",
       "chapter": 5,
       "title": "Chave gerada por SGBD",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-05/evidence/README.md"
       ]
@@ -221,7 +221,7 @@
       "id": "EX-05-05",
       "chapter": 5,
       "title": "Paginação determinística",
-      "status": "EX",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-05/evidence/README.md"
       ]

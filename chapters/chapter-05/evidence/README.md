@@ -46,3 +46,15 @@ O ensaio comprova correção funcional em conjunto pequeno. Ele não mede ganho 
 desempenho de `Prepare`, custo de offsets altos nem comportamento sob alterações
 concorrentes. Esses pontos exigem experimentos específicos nos capítulos de fetch,
 concorrência e desempenho.
+
+## Revisão contra o manuscrito
+
+O código e esta evidência foram confrontados com o Capítulo 5 após a execução. O
+texto passou a distinguir as classes de campo observadas, documentar a tipagem dos
+parâmetros antes de `Prepare`, explicar por que rollback não restaura a sequência do
+Firebird e limitar a comparação de offset e keyset ao cenário sem mutação concorrente.
+
+Os exemplos EX-05-01 a EX-05-05 podem avançar a `RV`: cada afirmação apresentada
+como resultado do laboratório possui uma asserção correspondente nos quatro perfis.
+`NextRecordSet`, desempenho de preparação e concorrência durante a paginação não são
+promovidos como resultados deste projeto.
