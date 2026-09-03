@@ -635,36 +635,46 @@
       "id": "EX-14-01",
       "chapter": 14,
       "title": "MemTable criado por campos",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-14/evidence/README.md"
+      ]
     },
     {
       "id": "EX-14-02",
       "chapter": 14,
       "title": "CopyDataSet seletivo",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-14/evidence/README.md"
+      ]
     },
     {
       "id": "EX-14-03",
       "chapter": 14,
       "title": "CloneCursor",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-14/evidence/README.md"
+      ]
     },
     {
       "id": "EX-14-04",
       "chapter": 14,
       "title": "Mestre-detalhe em memória",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-14/evidence/README.md"
+      ]
     },
     {
       "id": "EX-14-05",
       "chapter": 14,
       "title": "Dataset aninhado",
-      "status": "PL",
-      "evidence": []
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-14/evidence/README.md"
+      ]
     },
     {
       "id": "EX-15-01",
