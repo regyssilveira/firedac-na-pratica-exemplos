@@ -6,105 +6,135 @@
       "chapter": 1,
       "title": "Primeira conexão Firebird em VCL",
       "status": "RV",
-      "evidence": ["chapters/chapter-01/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-01/evidence/README.md"
+      ]
     },
     {
       "id": "EX-01-02",
       "chapter": 1,
       "title": "Primeira conexão SQLite sem servidor",
       "status": "RV",
-      "evidence": ["chapters/chapter-01/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-01/evidence/README.md"
+      ]
     },
     {
       "id": "EX-01-03",
       "chapter": 1,
       "title": "Consulta parametrizada de produto",
       "status": "RV",
-      "evidence": ["chapters/chapter-01/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-01/evidence/README.md"
+      ]
     },
     {
       "id": "EX-01-04",
       "chapter": 1,
       "title": "Conexão no designer versus código",
       "status": "RV",
-      "evidence": ["chapters/chapter-01/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-01/evidence/README.md"
+      ]
     },
     {
       "id": "EX-01-05",
       "chapter": 1,
       "title": "Biblioteca cliente ausente",
       "status": "RV",
-      "evidence": ["chapters/chapter-01/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-01/evidence/README.md"
+      ]
     },
     {
       "id": "EX-02-01",
       "chapter": 2,
       "title": "Fluxo visual dos componentes FireDAC",
       "status": "RV",
-      "evidence": ["chapters/chapter-02/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-02/evidence/README.md"
+      ]
     },
     {
       "id": "EX-02-02",
       "chapter": 2,
       "title": "DataModule compartilhado por dois forms",
       "status": "RV",
-      "evidence": ["chapters/chapter-02/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-02/evidence/README.md"
+      ]
     },
     {
       "id": "EX-02-03",
       "chapter": 2,
       "title": "Mesmo núcleo em VCL e console",
       "status": "RV",
-      "evidence": ["chapters/chapter-02/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-02/evidence/README.md"
+      ]
     },
     {
       "id": "EX-02-04",
       "chapter": 2,
       "title": "DriverLink explícito e registro automático",
       "status": "RV",
-      "evidence": ["chapters/chapter-02/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-02/evidence/README.md"
+      ]
     },
     {
       "id": "EX-02-05",
       "chapter": 2,
       "title": "Relatório de capacidades do driver",
       "status": "RV",
-      "evidence": ["chapters/chapter-02/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-02/evidence/README.md"
+      ]
     },
     {
       "id": "EX-03-01",
       "chapter": 3,
       "title": "Definição temporária em código",
       "status": "RV",
-      "evidence": ["chapters/chapter-03/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-03/evidence/README.md"
+      ]
     },
     {
       "id": "EX-03-02",
       "chapter": 3,
       "title": "Definição persistente em arquivo",
       "status": "RV",
-      "evidence": ["chapters/chapter-03/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-03/evidence/README.md"
+      ]
     },
     {
       "id": "EX-03-03",
       "chapter": 3,
       "title": "Firebird local, remoto e alias",
       "status": "CP",
-      "evidence": ["chapters/chapter-03/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-03/evidence/README.md"
+      ]
     },
     {
       "id": "EX-03-04",
       "chapter": 3,
       "title": "PostgreSQL com PGAdvanced",
       "status": "CP",
-      "evidence": ["chapters/chapter-03/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-03/evidence/README.md"
+      ]
     },
     {
       "id": "EX-03-05",
       "chapter": 3,
       "title": "Seleção dev/teste/produção",
       "status": "RV",
-      "evidence": ["chapters/chapter-03/evidence/README.md"]
+      "evidence": [
+        "chapters/chapter-03/evidence/README.md"
+      ]
     },
     {
       "id": "EX-04-01",
@@ -155,36 +185,46 @@
       "id": "EX-05-01",
       "chapter": 5,
       "title": "Lista com TFDQuery",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-05/evidence/README.md"
+      ]
     },
     {
       "id": "EX-05-02",
       "chapter": 5,
       "title": "DML com ExecSQL",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-05/evidence/README.md"
+      ]
     },
     {
       "id": "EX-05-03",
       "chapter": 5,
       "title": "Comando reutilizável com TFDCommand",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-05/evidence/README.md"
+      ]
     },
     {
       "id": "EX-05-04",
       "chapter": 5,
       "title": "Chave gerada por SGBD",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-05/evidence/README.md"
+      ]
     },
     {
       "id": "EX-05-05",
       "chapter": 5,
       "title": "Paginação determinística",
-      "status": "PL",
-      "evidence": []
+      "status": "EX",
+      "evidence": [
+        "chapters/chapter-05/evidence/README.md"
+      ]
     },
     {
       "id": "EX-06-01",

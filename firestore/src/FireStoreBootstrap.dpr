@@ -172,12 +172,12 @@ begin
   ProductCount := AConnection.ExecSQLScalar('SELECT COUNT(*) FROM product');
   ProductName := VarToStr(AConnection.ExecSQLScalar(
     'SELECT name FROM product WHERE sku = :sku', ['BEB-001']));
-  if (VersionCount <> 2) or (CategoryCount <> 2) or (ProductCount <> 3) or
+  if (VersionCount <> 3) or (CategoryCount <> 2) or (ProductCount <> 3) or
      (ProductName <> 'Caf' + #$00E9 + ' especial') then
     raise Exception.CreateFmt(
       'Smoke test falhou: versões=%d categorias=%d produtos=%d produto=%s',
       [VersionCount, CategoryCount, ProductCount, ProductName]);
-  Writeln('Smoke test aprovado: 2 migrations, 2 categorias e 3 produtos.');
+  Writeln('Smoke test aprovado: 3 migrations, 2 categorias e 3 produtos.');
 end;
 
 var
