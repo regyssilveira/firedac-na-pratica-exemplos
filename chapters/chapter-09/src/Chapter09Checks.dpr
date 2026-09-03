@@ -519,6 +519,9 @@ begin
 end;
 
 begin
+  { Disable the tracer finalization dialog for every execution path.  Individual
+    trace scenarios also keep TFDMoniFlatFileClientLink.ShowTraces disabled. }
+  FADShowTraces := False;
   try
     if ParamCount <> 1 then
     begin
