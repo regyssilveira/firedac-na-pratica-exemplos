@@ -121,11 +121,13 @@ begin
   Query := TFDQuery.Create(nil);
   try
     Query.Connection := AConnection;
-    Query.SQL.Text :=
-      'SELECT id FROM product WHERE ' +
-      '(:category_id IS NULL OR category_id = :category_id) AND ' +
-      '(:minimum_price IS NULL OR price >= :minimum_price) ' +
-      'ORDER BY name, id';
+    Query.SQL.Text := '''
+      SELECT id
+      FROM product
+      WHERE (:category_id IS NULL OR category_id = :category_id)
+        AND (:minimum_price IS NULL OR price >= :minimum_price)
+      ORDER BY name, id
+      ''';
     ConfigureOptionalParams(Query, ACategory, AMinimumPrice);
     Query.Open;
     Result := 0;
@@ -186,8 +188,11 @@ begin
   Query := TFDQuery.Create(nil);
   try
     Query.Connection := AConnection;
-    Query.SQL.Text :=
-      'SELECT id, sku, name, price FROM product ORDER BY &order_expression';
+    Query.SQL.Text := '''
+      SELECT id, sku, name, price
+      FROM product
+      ORDER BY &order_expression
+      ''';
     Query.MacroByName('order_expression').AsRaw := OrderExpression(AOrder);
     Query.Open;
     Check(not Query.IsEmpty, 'Ordenação retornou conjunto vazio.');
@@ -353,9 +358,8 @@ begin
     procedure(Connection: TFDConnection)
     var
       Update, Query: TFDQuery;
-      ExternalId: string;
     begin
-      ExternalId := '7f6a9a6e-91bb-4f99-a9c8-00e8a5dd9106';
+      var ExternalId := '7f6a9a6e-91bb-4f99-a9c8-00e8a5dd9106';
       Update := TFDQuery.Create(nil);
       Query := TFDQuery.Create(nil);
       Connection.StartTransaction;
@@ -370,9 +374,12 @@ begin
         Update.ExecSQL;
 
         Query.Connection := Connection;
-        Query.SQL.Text :=
-          'SELECT id, sku, name, price, active, external_id, available_at, ' +
-          'image_data FROM product WHERE id = :id';
+        Query.SQL.Text := '''
+          SELECT id, sku, name, price, active, external_id, available_at,
+                 image_data
+          FROM product
+          WHERE id = :id
+          ''';
         Query.ParamByName('id').AsLargeInt := 1;
         Query.Open;
         Check(Query.FieldByName('id').DataType in [ftInteger, ftLargeint],
