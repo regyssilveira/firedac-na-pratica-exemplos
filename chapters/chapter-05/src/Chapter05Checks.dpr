@@ -97,9 +97,12 @@ begin
       Query := TFDQuery.Create(nil);
       try
         Query.Connection := Connection;
-        Query.SQL.Text :=
-          'SELECT id, sku, name, price, active FROM product ' +
-          'WHERE active = :active ORDER BY name, id';
+        Query.SQL.Text := '''
+          SELECT id, sku, name, price, active
+          FROM product
+          WHERE active = :active
+          ORDER BY name, id
+          ''';
         Query.ParamByName('active').AsBoolean := True;
         Query.Open;
         Check(Query.FieldByName('id').DataType in [ftInteger, ftLargeint],
@@ -144,8 +147,11 @@ begin
         Query.Connection := Connection;
         OriginalPrice := Connection.ExecSQLScalar(
           'SELECT price FROM product WHERE id = :id', [1]);
-        Query.SQL.Text :=
-          'UPDATE product SET price = :price, version = version + 1 WHERE id = :id';
+        Query.SQL.Text := '''
+          UPDATE product
+          SET price = :price, version = version + 1
+          WHERE id = :id
+          ''';
         Query.ParamByName('price').AsCurrency := OriginalPrice + 1;
         Query.ParamByName('id').AsLargeInt := 1;
         Query.ExecSQL;
