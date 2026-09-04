@@ -61,16 +61,15 @@ implementation
 
 function TMainForm.RequiredEnvironment(const AName: string): string;
 begin
-  Result := GetEnvironmentVariable(AName);
-  if Result = '' then
+  var Value := GetEnvironmentVariable(AName);
+  if Value = '' then
     raise Exception.CreateFmt('Variável obrigatória ausente: %s', [AName]);
+  Result := Value;
 end;
 
 procedure TMainForm.ConfigureConnection;
-var
-  Driver: string;
 begin
-  Driver := RequiredEnvironment('FIRESTORE_DRIVER');
+  var Driver := RequiredEnvironment('FIRESTORE_DRIVER');
   Connection.Close;
   Connection.Params.Clear;
   Connection.LoginPrompt := False;
@@ -103,8 +102,11 @@ begin
   try
     Connection.Open;
     QryProducts.Close;
-    QryProducts.SQL.Text :=
-      'SELECT id, sku, name, price FROM product ORDER BY name, id';
+    QryProducts.SQL.Text := '''
+      SELECT id, sku, name, price
+      FROM product
+      ORDER BY name, id
+      ''';
     QryProducts.Open;
     LblStatus.Caption := Format('%d produto(s).', [QryProducts.RecordCount]);
   except
@@ -119,12 +121,10 @@ begin
 end;
 
 procedure TMainForm.FormShow(Sender: TObject);
-var
-  ResultFile: string;
 begin
   if GetEnvironmentVariable('CH01_AUTORUN') <> '1' then
     Exit;
-  ResultFile := GetEnvironmentVariable('CH01_AUTORUN_RESULT');
+  var ResultFile := GetEnvironmentVariable('CH01_AUTORUN_RESULT');
   try
     OpenCatalog;
     if QryProducts.IsEmpty then
@@ -149,8 +149,11 @@ begin
     ConfigureConnection;
   Connection.Open;
   QryProducts.Close;
-  QryProducts.SQL.Text :=
-    'SELECT id, sku, name, price FROM product WHERE sku = :sku';
+  QryProducts.SQL.Text := '''
+    SELECT id, sku, name, price
+    FROM product
+    WHERE sku = :sku
+    ''';
   QryProducts.ParamByName('sku').AsString := EdtSku.Text;
   QryProducts.Open;
   LblStatus.Caption := Format('%d produto(s).', [QryProducts.RecordCount]);
