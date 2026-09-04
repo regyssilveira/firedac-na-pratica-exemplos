@@ -11,9 +11,11 @@ o resultado existente: uma única linha, ID 211001. A política marcou a repeti�
 chave como insegura.
 
 EX-21-03 comprovou `IBAdvanced=wire_crypt=Required`; `MON$WIRE_CRYPT_PLUGIN` reportou
-`ChaCha64`, e senha errada falhou. Isso é wire encryption do Firebird, não TLS X.509.
-SQLite é embarcado e retornou `integrity_check=ok`. O gate TLS com CA/hostname em
-PostgreSQL/MySQL continua pendente; por isso EX-21-03 fica em `EC`.
+`ChaCha64`, e senha errada falhou. Em um laboratório PostgreSQL 18 separado, uma CA e
+um certificado de servidor descartáveis permitiram confirmar TLS com
+`sslmode=verify-full`. Conexões com hostname divergente e CA desconhecida falharam
+como previsto. A matriz passou com `libpq` Win32 e Win64; EX-21-03 está em `RV`.
+SQLite é embarcado e retornou `integrity_check=ok`.
 
 EX-21-04 montou pacotes Win32/Win64 com executável, cliente Firebird, runtime,
 plugin ChaCha e licenças, todos inventariados por SHA-256 em

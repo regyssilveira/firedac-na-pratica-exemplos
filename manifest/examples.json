@@ -934,7 +934,7 @@
       "id": "EX-21-03",
       "chapter": 21,
       "title": "TLS com validação e falhas",
-      "status": "EC",
+      "status": "RV",
       "evidence": ["chapters/chapter-21/evidence/README.md"]
     },
     {
