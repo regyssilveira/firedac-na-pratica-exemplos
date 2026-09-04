@@ -98,10 +98,12 @@ end;
 
 procedure ConfigureInsert(AQuery: TFDQuery);
 begin
-  AQuery.SQL.Text :=
-    'INSERT INTO product ' +
-    '(id, sku, name, category_id, price, active, version) ' +
-    'VALUES (:id, :sku, :name, :category_id, :price, :active, :version)';
+  AQuery.SQL.Text := '''
+    INSERT INTO product
+      (id, sku, name, category_id, price, active, version)
+    VALUES
+      (:id, :sku, :name, :category_id, :price, :active, :version)
+    ''';
   AQuery.ParamByName('id').DataType := ftLargeint;
   AQuery.ParamByName('sku').DataType := ftString;
   AQuery.ParamByName('sku').Size := 30;
@@ -117,13 +119,11 @@ end;
 procedure FillInsertParams(AQuery: TFDQuery; ACount: Integer;
   const ASkuPrefix: string; ADuplicateIndex: Integer = -1;
   AFirstId: Int64 = 130001);
-var
-  I, SkuIndex: Integer;
 begin
   AQuery.Params.ArraySize := ACount;
-  for I := 0 to ACount - 1 do
+  for var I := 0 to ACount - 1 do
   begin
-    SkuIndex := I;
+    var SkuIndex := I;
     if I = ADuplicateIndex then
       SkuIndex := 0;
     AQuery.ParamByName('id').AsLargeInts[I] := AFirstId + I;
