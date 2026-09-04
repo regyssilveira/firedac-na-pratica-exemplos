@@ -40,6 +40,13 @@ begin
     raise Exception.CreateFmt('Variável obrigatória ausente: %s', [AName]);
 end;
 
+function OptionalEnvironment(const AName, ADefault: string): string;
+begin
+  Result := GetEnvironmentVariable(AName);
+  if Result = '' then
+    Result := ADefault;
+end;
+
 function ParseEnvironment(const AValue: string): TAppEnvironment;
 begin
   if SameText(AValue, 'development') then
@@ -142,14 +149,16 @@ begin
 end;
 
 procedure ConfigureFirebird(AConnection: TFDConnection;
-  ALink: TFDPhysFBDriverLink; const AServer, ADatabase: string);
+  ALink: TFDPhysFBDriverLink; const AServer, ADatabase: string;
+  const APort: string = '');
 begin
   ALink.VendorLib := RequiredEnvironment('FIRESTORE_FBCLIENT');
   AConnection.LoginPrompt := False;
   AConnection.Params.Values['DriverID'] := 'FB';
   AConnection.Params.Values['Protocol'] := 'TCPIP';
   AConnection.Params.Values['Server'] := AServer;
-  AConnection.Params.Values['Port'] := RequiredEnvironment('FIRESTORE_DB_PORT');
+  AConnection.Params.Values['Port'] :=
+    if APort <> '' then APort else RequiredEnvironment('FIRESTORE_DB_PORT');
   AConnection.Params.Values['Database'] := ADatabase;
   AConnection.Params.Values['User_Name'] := RequiredEnvironment('FIRESTORE_DB_USER');
   AConnection.Params.Values['Password'] := RequiredEnvironment('FIRESTORE_DB_PASSWORD');
@@ -161,6 +170,7 @@ var
   Connection: TFDConnection;
   Link: TFDPhysFBDriverLink;
   RemoteParams, AliasParams: TStringList;
+  RemoteHost, RemotePort, RemoteDatabase, RemoteAlias: string;
 begin
   Connection := TFDConnection.Create(nil);
   Link := TFDPhysFBDriverLink.Create(nil);
@@ -182,7 +192,24 @@ begin
       'O caminho remoto deixou de ser caminho do servidor.');
     Check(AliasParams.Values['Database'] = 'FIRESTORE_PROD',
       'O alias não foi preservado como nome lógico.');
-    Writeln('EX-03-03 parcial: TCP local executado; remoto e alias configurados.');
+
+    RemoteHost := GetEnvironmentVariable('CH03_REMOTE_FB_HOST');
+    RemotePort := GetEnvironmentVariable('CH03_REMOTE_FB_PORT');
+    RemoteDatabase := GetEnvironmentVariable('CH03_REMOTE_FB_DATABASE');
+    RemoteAlias := GetEnvironmentVariable('CH03_REMOTE_FB_ALIAS');
+    if (RemoteHost <> '') and (RemotePort <> '') and
+       (RemoteDatabase <> '') and (RemoteAlias <> '') then
+    begin
+      Connection.Close;
+      ConfigureFirebird(Connection, Link, RemoteHost, RemoteDatabase, RemotePort);
+      ValidateCatalog(Connection);
+      Connection.Close;
+      ConfigureFirebird(Connection, Link, RemoteHost, RemoteAlias, RemotePort);
+      ValidateCatalog(Connection);
+      Writeln('EX-03-03 aprovado: TCP local, endpoint independente e alias executados.');
+    end
+    else
+      Writeln('EX-03-03 parcial: TCP local executado; remoto e alias configurados.');
   finally
     AliasParams.Free;
     RemoteParams.Free;
@@ -195,6 +222,7 @@ procedure RunPostgreSQLConfiguration;
 var
   Connection: TFDConnection;
   Link: TFDPhysPgDriverLink;
+  Password, ApplicationName: string;
 begin
   Connection := TFDConnection.Create(nil);
   Link := TFDPhysPgDriverLink.Create(nil);
@@ -202,19 +230,33 @@ begin
     Link.VendorLib := RequiredEnvironment('CH03_LIBPQ');
     Connection.LoginPrompt := False;
     Connection.Params.Values['DriverID'] := 'PG';
-    Connection.Params.Values['Server'] := '127.0.0.1';
-    Connection.Params.Values['Port'] := '5432';
-    Connection.Params.Values['Database'] := 'postgres';
-    Connection.Params.Values['User_Name'] := 'postgres';
+    Connection.Params.Values['Server'] := OptionalEnvironment('CH03_PG_HOST', '127.0.0.1');
+    Connection.Params.Values['Port'] := OptionalEnvironment('CH03_PG_PORT', '5432');
+    Connection.Params.Values['Database'] := OptionalEnvironment('CH03_PG_DATABASE', 'postgres');
+    Connection.Params.Values['User_Name'] := OptionalEnvironment('CH03_PG_USER', 'postgres');
     Connection.Params.Values['PGAdvanced'] :=
-      'application_name=FireDACNaPratica&connect_timeout=3';
+      'application_name=FireDACNaPratica;connect_timeout=3';
     Check(FileExists(Link.VendorLib), 'libpq.dll configurada não existe.');
     Check(Pos('application_name=',
       Connection.Params.Values['PGAdvanced']) = 1,
       'PGAdvanced não contém ApplicationName.');
     Check(Connection.Params.Values['Password'] = '',
       'O exemplo de configuração não deve persistir senha.');
-    Writeln('EX-03-04 compilado: PGAdvanced validado; conexão aguarda credencial.');
+    Password := GetEnvironmentVariable('CH03_PG_PASSWORD');
+    if Password <> '' then
+    begin
+      Connection.Params.Values['Password'] := Password;
+      Connection.Open;
+      ApplicationName := Connection.ExecSQLScalar(
+        'select current_setting(''application_name'')');
+      Check(ApplicationName = 'FireDACNaPratica',
+        'PostgreSQL não recebeu application_name por PGAdvanced.');
+      Check(Connection.ExecSQLScalar('select current_setting(''server_version_num'')::int') > 0,
+        'PostgreSQL não informou a versão do servidor.');
+      Writeln('EX-03-04 aprovado: PGAdvanced autenticado e observado no servidor.');
+    end
+    else
+      Writeln('EX-03-04 compilado: PGAdvanced validado; conexão aguarda credencial.');
   finally
     Link.Free;
     Connection.Free;

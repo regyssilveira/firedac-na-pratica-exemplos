@@ -1,11 +1,12 @@
 # Evidência — capítulo 3
 
-**Data:** 3 de setembro de 2026
+**Data:** 4 de setembro de 2026
 
-**Ambiente:** RAD Studio 13 Florence, Delphi 37.0; Firebird 5.0.4; PostgreSQL 18
-ativo em TCP 5432; SQLite estático do FireDAC.
+**Ambiente:** RAD Studio 13 Florence, Delphi 37.0; Firebird 5.0.4 local e em
+contêiner independente; PostgreSQL 18 em contêiner; SQLite estático do FireDAC.
 
-Comando reproduzível: `scripts/validate-chapter-03.ps1`.
+Comandos reproduzíveis: `scripts/validate-chapter-03.ps1` e
+`scripts/validate-chapter-03-external.ps1`.
 
 ## Resultados
 
@@ -13,8 +14,8 @@ Comando reproduzível: `scripts/validate-chapter-03.ps1`.
 |---|---|---:|---:|---|
 | EX-03-01 | executado | aprovado | aprovado | Parâmetros diretos e definição privada abriram SQLite. |
 | EX-03-02 | executado | aprovado | aprovado | Arquivo absoluto foi criado sem senha e usado para abrir SQLite. |
-| EX-03-03 | compilado/parcial | local aprovado | local aprovado | Perfis remoto e alias foram construídos, não conectados. |
-| EX-03-04 | compilado | aprovado | aprovado | `PGAdvanced` foi validado sem abrir PostgreSQL. |
+| EX-03-03 | revisado | aprovado | aprovado | TCP local, endpoint independente e alias executados. |
+| EX-03-04 | revisado | aprovado | aprovado | `PGAdvanced` autenticado e observado no servidor. |
 | EX-03-05 | executado | aprovado | aprovado | Três nomes aceitos; nome desconhecido rejeitado antes da conexão. |
 
 ## Descoberta sobre persistência
@@ -27,21 +28,15 @@ invoca `ConnectionDefs.Save`.
 
 ## PostgreSQL e alias Firebird
 
-O serviço PostgreSQL respondeu em `127.0.0.1:5432`, mas a autenticação SCRAM rejeitou
-a credencial convencional de laboratório. Nenhuma conta, senha ou regra `pg_hba.conf`
-foi alterada. A instalação disponível possui cliente x64; portanto, conexão real e
-matriz Win32/Win64 continuam pendentes.
-
-O Firebird abriu o banco descartável por TCP local. O perfil remoto preservou o
-caminho como caminho do servidor e o perfil de alias preservou o nome lógico, mas não
-havia alias de laboratório configurado. Esses dois caminhos não são descritos como
-executados.
+O laboratório descartável abriu o Firebird por TCP em um segundo endpoint usando
+tanto o caminho do servidor quanto o alias `FIRESTORE_PROD`. No PostgreSQL, a sessão
+autenticada confirmou no próprio servidor o valor `FireDACNaPratica` recebido por
+`PGAdvanced`. Os dois cenários passaram com clientes nativos Win32 e Win64.
 
 Binários, bancos, arquivos de definição e credenciais permaneceram fora do Git.
 
 ## Revisão contra o manuscrito
 
-EX-03-01, EX-03-02 e EX-03-05 foram confrontados com o Capítulo 3 e podem avançar a
-`RV`. O texto incorporou a chamada explícita a `SaveConnectionDefFile` e separou
-configuração, compilação e sessão autenticada. EX-03-03 e EX-03-04 continuam em `CP`
-até os caminhos remoto/alias e PostgreSQL serem executados.
+Os cinco exemplos foram confrontados com o Capítulo 3 e estão em `RV`. O texto
+incorporou a chamada explícita a `SaveConnectionDefFile` e separou configuração,
+compilação e sessão autenticada.

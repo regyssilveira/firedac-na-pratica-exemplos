@@ -113,7 +113,7 @@
       "id": "EX-03-03",
       "chapter": 3,
       "title": "Firebird local, remoto e alias",
-      "status": "CP",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-03/evidence/README.md"
       ]
@@ -122,7 +122,7 @@
       "id": "EX-03-04",
       "chapter": 3,
       "title": "PostgreSQL com PGAdvanced",
-      "status": "CP",
+      "status": "RV",
       "evidence": [
         "chapters/chapter-03/evidence/README.md"
       ]

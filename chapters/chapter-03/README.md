@@ -9,8 +9,8 @@ persistentes.
 - `temporary`: parâmetros diretamente em `TFDConnection`;
 - `private`: definição nomeada não persistente;
 - `persistent`: definição marcada persistente e gravada explicitamente;
-- `firebird`: conexão TCP local e construção dos perfis remoto/alias;
-- `postgres-config`: composição `PGAdvanced` sem autenticação;
+- `firebird`: conexão TCP local, endpoint independente e alias de servidor;
+- `postgres-config`: composição e conexão autenticada com `PGAdvanced`;
 - `environment`: allowlist de desenvolvimento, teste e produção, com caso negativo.
 
 ## Validação
@@ -21,7 +21,13 @@ persistentes.
   -AppPassword '<senha descartável para FIRESTORE_APP>'
 ```
 
-O PostgreSQL 18 local exige uma credencial que não pertence ao repositório. Sem ela,
-o exemplo valida somente a composição e permanece em `CP`. O perfil remoto/alias do
-Firebird também permanece em `CP` até ser executado contra um segundo endpoint e um
-alias configurado no servidor.
+Para reproduzir também os cenários externos em laboratórios descartáveis:
+
+```powershell
+.\scripts\validate-chapter-03-external.ps1
+```
+
+O segundo comando cria contêineres temporários de Firebird 5.0.4 e PostgreSQL 18,
+executa conexão por caminho remoto, alias e `PGAdvanced` em Win32 e Win64 e remove os
+contêineres ao terminar. As senhas padrão do script são exclusivas do laboratório e
+podem ser substituídas por parâmetros.
