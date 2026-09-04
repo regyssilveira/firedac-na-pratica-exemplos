@@ -124,8 +124,12 @@ begin
     LocalSQL.DataSets.Add(Products, '', 'products');
     LocalSQL.Active := True;
     Query.Connection := Connection;
-    Query.SQL.Text := 'SELECT active, COUNT(*) AS qty, SUM(price) AS total ' +
-      'FROM products GROUP BY active ORDER BY active';
+    Query.SQL.Text := '''
+      SELECT active, COUNT(*) AS qty, SUM(price) AS total
+      FROM products
+      GROUP BY active
+      ORDER BY active
+      ''';
     Query.Open;
     Check(Query.RecordCount = 2, 'Agrupamento local deveria ter dois grupos.');
     Check(Query.FieldByName('active').AsInteger = 0, 'Primeiro grupo incorreto.');
@@ -191,8 +195,12 @@ begin
     LocalSQL.DataSets.Add(Targets, '', 'targets');
     LocalSQL.Active := True;
     Query.Connection := Connection;
-    Query.SQL.Text := 'SELECT p.sku, p.name, COALESCE(t.target_quantity, 0) AS target ' +
-      'FROM products p LEFT JOIN targets t ON t.sku = p.sku ORDER BY p.product_id';
+    Query.SQL.Text := '''
+      SELECT p.sku, p.name, COALESCE(t.target_quantity, 0) AS target
+      FROM products p
+      LEFT JOIN targets t ON t.sku = p.sku
+      ORDER BY p.product_id
+      ''';
     Query.Open;
     Check(Query.RecordCount = 3, 'LEFT JOIN não preservou os três produtos.');
     Check(Query.FieldByName('target').AsInteger = 10, 'Meta do primeiro SKU incorreta.');
