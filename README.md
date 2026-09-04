@@ -11,6 +11,8 @@ ao banco às técnicas avançadas com Delphi**, de Regys Silveira.
 
 - RAD Studio 13 Florence / Delphi 37.0;
 - um único código-fonte para Windows 32-bit e Windows 64-bit, ambos validados;
+- sintaxe moderna do Delphi, incluindo variáveis inline, inferência de tipo e strings
+  multilinha onde elas tornam os exemplos mais claros;
 - Firebird 5.0.x como SGBD principal;
 - PostgreSQL 18.x, SQLite embutido e MySQL 8.4 LTS como laboratórios complementares.
 
