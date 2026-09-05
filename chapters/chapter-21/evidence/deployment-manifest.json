@@ -2,7 +2,7 @@
   {
     "architecture": "Win32",
     "file": "Chapter21Checks.exe",
-    "sha256": "156dcb9ee1dc8f5543d5c75155400d21869217b3b87be63abe47ea942f869e5a",
+    "sha256": "fa805fb6a7ed63296b9e54472db8594834c413b723574c10efa7a7b186179198",
     "bytes": 3964416,
     "license": "Book example / Apache-2.0"
   },
@@ -65,7 +65,7 @@
   {
     "architecture": "Win64",
     "file": "Chapter21Checks.exe",
-    "sha256": "19f1875adb1ebfec8f80c9a12f21051a2b0e8041060dfbec8add4a3a298ec43d",
+    "sha256": "51e8b13501e2a261aeb6b36cf11bb3930ed1d50eedbca875b1abe74511f8913d",
     "bytes": 6371840,
     "license": "Book example / Apache-2.0"
   },
