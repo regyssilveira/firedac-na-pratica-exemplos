@@ -11,4 +11,5 @@ produção. Um exemplo só pode avançar de estado quando a evidência exigida e
 - `IM`: fonte e instruções implementadas;
 - `CP`: compilação limpa registrada;
 - `EX`: execução e resultado esperado registrados;
+- `EC`: evidência parcial registrada, com um gate externo explícito ainda pendente;
 - `RV`: revisão técnica, segurança e sincronização com a edição concluídas.

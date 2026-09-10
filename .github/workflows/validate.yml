@@ -1,4 +1,4 @@
-name: Validate examples manifest
+name: Validate public examples metadata
 
 on:
   push:
@@ -9,6 +9,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Validate manifest
+      - name: Validate manifest structure and evidence paths
         shell: pwsh
         run: ./scripts/validate-manifest.ps1
