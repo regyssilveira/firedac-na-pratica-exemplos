@@ -1,7 +1,7 @@
 # FireDAC na Prática — exemplos oficiais
 
 Repositório público dos exemplos do livro **FireDAC na Prática: Do primeiro acesso
-ao banco às técnicas avançadas com Delphi**, de Regys Silveira.
+ao banco às técnicas avançadas com Delphi**, de Régys Borges da Silveira.
 
 > Estado do repositório: 109 exemplos estão revisados (`RV`) e um permanece com
 > evidência condicionada (`EC`). O item condicionado é `EX-21-04`, que depende da
@@ -26,6 +26,16 @@ infra/             ambiente local reproduzível, sem credenciais
 manifest/          estado e evidências dos exemplos
 scripts/           validações e automações
 ```
+
+Os exemplos do Capítulo 4 integram o marco M0 da aplicação evolutiva. Por isso, ficam
+em `firestore/` e `manifest/evidence/M0/`, em vez de possuir um diretório
+`chapters/chapter-04/` separado.
+
+## Versão correspondente ao livro
+
+A primeira edição de 2026 corresponde à tag `livro-1.0.0-1ed-2026`. Para reproduzir
+exatamente a edição impressa, faça checkout dessa tag; a branch `main` continuará
+recebendo correções e aperfeiçoamentos posteriores.
 
 Cada exemplo percorre os estados:
 
@@ -88,4 +98,4 @@ oficiais, valida seus hashes e separa os clientes por arquitetura. Consulte
 
 Código autoral distribuído sob a Apache License 2.0. Exemplos ou dependências de
 terceiros continuam sujeitos às respectivas licenças e devem ser identificados.
-Exemplos oficiais do livro FireDAC na Prática, de Regys Silveira
+Exemplos oficiais do livro FireDAC na Prática, de Régys Borges da Silveira
