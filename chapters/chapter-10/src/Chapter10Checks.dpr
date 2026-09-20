@@ -103,22 +103,30 @@ begin
     Connection.StartTransaction;
     try
       Connection.ExecSQL(
-        'INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-        'VALUES (:id, :key, :status, :total)',
+        '''
+          INSERT INTO sales_order (id, idempotency_key, order_status, total)
+          VALUES (:id, :key, :status, :total)
+          ''',
         [OrderId, 'EX-10-01', 'CONFIRMED', 20.00]);
       Connection.ExecSQL(
-        'INSERT INTO sales_order_item ' +
-        '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-        'VALUES (:item_id, :order_id, 1, 1, 2, 10.00)',
+        '''
+          INSERT INTO sales_order_item
+          (id, order_id, line_no, product_id, quantity, unit_price)
+          VALUES (:item_id, :order_id, 1, 1, 2, 10.00)
+          ''',
         [101101, OrderId]);
       Check(Connection.ExecSQL(
-        'UPDATE inventory SET quantity = quantity - 2 ' +
-        'WHERE product_id = 1 AND quantity >= 2') = 1,
+        '''
+          UPDATE inventory SET quantity = quantity - 2
+          WHERE product_id = 1 AND quantity >= 2
+          ''') = 1,
         'Baixa de estoque não afetou uma linha.');
       Connection.ExecSQL(
-        'INSERT INTO outbox_event ' +
-        '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-        'VALUES (:id, :kind, :aggregate_id, :event_type, :payload)',
+        '''
+          INSERT INTO outbox_event
+          (id, aggregate_type, aggregate_id, event_type, payload)
+          VALUES (:id, :kind, :aggregate_id, :event_type, :payload)
+          ''',
         [101201, 'ORDER', OrderId, 'ORDER_CONFIRMED', '{"order_id":101001}']);
       Connection.Commit;
     except
@@ -165,17 +173,21 @@ begin
     Connection.StartTransaction;
     try
       Connection.ExecSQL(
-        'INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-        'VALUES (:id, :key, :status, :total)',
+        '''
+          INSERT INTO sales_order (id, idempotency_key, order_status, total)
+          VALUES (:id, :key, :status, :total)
+          ''',
         [OrderId, 'EX-10-02', 'PENDING', 10.00]);
       try
         Connection.ExecSQL(
-          'INSERT INTO sales_order_item ' +
-          '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-          'VALUES (:item_id, :order_id, 1, 1, 0, 10.00)',
+          '''
+            INSERT INTO sales_order_item
+            (id, order_id, line_no, product_id, quantity, unit_price)
+            VALUES (:item_id, :order_id, 1, 1, 0, 10.00)
+            ''',
           [102101, OrderId]);
       except
-        on E: EFDDBEngineException do
+        on CaughtException: EFDDBEngineException do
           ConstraintRaised := True;
       end;
       Check(ConstraintRaised, 'A constraint de quantidade não rejeitou zero.');
@@ -216,15 +228,19 @@ begin
     Connection.StartTransaction;
     try
       Connection.ExecSQL(
-        'INSERT INTO outbox_event ' +
-        '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-        'VALUES (103101, ''TEST'', :id, ''OUTER_BEFORE'', ''{}'')', [AggregateId]);
+        '''
+          INSERT INTO outbox_event
+          (id, aggregate_type, aggregate_id, event_type, payload)
+          VALUES (103101, 'TEST', :id, 'OUTER_BEFORE', '{}')
+          ''', [AggregateId]);
       Connection.StartTransaction;
       try
         Connection.ExecSQL(
-          'INSERT INTO outbox_event ' +
-          '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-          'VALUES (103102, ''TEST'', :id, ''INNER'', ''{}'')', [AggregateId]);
+          '''
+            INSERT INTO outbox_event
+            (id, aggregate_type, aggregate_id, event_type, payload)
+            VALUES (103102, 'TEST', :id, 'INNER', '{}')
+            ''', [AggregateId]);
         Connection.Rollback;
       except
         if Connection.InTransaction then
@@ -237,9 +253,11 @@ begin
         'SELECT COUNT(*) FROM outbox_event WHERE id = 103102') = 0,
         'Rollback do savepoint preservou a alteração interna.');
       Connection.ExecSQL(
-        'INSERT INTO outbox_event ' +
-        '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-        'VALUES (103103, ''TEST'', :id, ''OUTER_AFTER'', ''{}'')', [AggregateId]);
+        '''
+          INSERT INTO outbox_event
+          (id, aggregate_type, aggregate_id, event_type, payload)
+          VALUES (103103, 'TEST', :id, 'OUTER_AFTER', '{}')
+          ''', [AggregateId]);
       Connection.Commit;
     except
       if Connection.InTransaction then
@@ -288,7 +306,7 @@ begin
       ASecond.Commit;
       WriterCommitted := True;
     except
-      on E: EFDDBEngineException do
+      on CaughtException: EFDDBEngineException do
       begin
         if ASecond.InTransaction then
           ASecond.Rollback;
@@ -381,9 +399,11 @@ begin
       procedure
       begin
         Connection.ExecSQL(
-          'INSERT INTO outbox_event ' +
-          '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-          'VALUES (105101, ''TEST'', :id, ''OWNED_COMMIT'', ''{}'')', [AggregateId]);
+          '''
+            INSERT INTO outbox_event
+            (id, aggregate_type, aggregate_id, event_type, payload)
+            VALUES (105101, 'TEST', :id, 'OWNED_COMMIT', '{}')
+            ''', [AggregateId]);
       end);
     Check(not Connection.InTransaction, 'Helper dono não encerrou a transação.');
     Check(Connection.ExecSQLScalar(
@@ -396,14 +416,16 @@ begin
         procedure
         begin
           Connection.ExecSQL(
-            'INSERT INTO outbox_event ' +
-            '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-            'VALUES (105102, ''TEST'', :id, ''OWNED_ROLLBACK'', ''{}'')', [AggregateId]);
+            '''
+              INSERT INTO outbox_event
+              (id, aggregate_type, aggregate_id, event_type, payload)
+              VALUES (105102, 'TEST', :id, 'OWNED_ROLLBACK', '{}')
+              ''', [AggregateId]);
           raise Exception.Create('Falha intencional do callback.');
         end);
     except
-      on E: Exception do
-        Failed := SameText(E.Message, 'Falha intencional do callback.');
+      on CaughtException: Exception do
+        Failed := SameText(CaughtException.Message, 'Falha intencional do callback.');
     end;
     Check(Failed, 'Helper não preservou a exceção do callback.');
     Check(Connection.ExecSQLScalar(
@@ -416,9 +438,11 @@ begin
         procedure
         begin
           Connection.ExecSQL(
-            'INSERT INTO outbox_event ' +
-            '(id, aggregate_type, aggregate_id, event_type, payload) ' +
-            'VALUES (105103, ''TEST'', :id, ''PARTICIPANT'', ''{}'')', [AggregateId]);
+            '''
+              INSERT INTO outbox_event
+              (id, aggregate_type, aggregate_id, event_type, payload)
+              VALUES (105103, 'TEST', :id, 'PARTICIPANT', '{}')
+              ''', [AggregateId]);
         end);
       Check(Connection.InTransaction,
         'Helper participante confirmou a transação externa.');
@@ -462,9 +486,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

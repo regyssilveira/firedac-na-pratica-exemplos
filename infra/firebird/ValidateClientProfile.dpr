@@ -16,9 +16,9 @@ begin
       raise Exception.CreateFmt('Cliente não encontrado: %s', [ClientPath]);
     Writeln(ClientPath);
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

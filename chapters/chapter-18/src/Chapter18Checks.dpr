@@ -86,34 +86,38 @@ begin
   if IsFirebird then
     Result := 'SELECT id, category_id, name FROM benchmark_product_rows(:row_count)'
   else
-    Result := 'WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq ' +
-      'WHERE id < :row_count) SELECT id, id % 10 AS category_id, ' +
-      '''Product '' || id AS name FROM seq';
+    Result := '''
+      WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq
+      WHERE id < :row_count) SELECT id, id % 10 AS category_id,
+      'Product ' || id AS name FROM seq
+      ''';
 end;
 
 function DetailSql: string;
 begin
   if IsFirebird then
-    Result := 'SELECT CAST(:id AS INTEGER) AS id, ' +
-      'MOD(CAST(:id AS INTEGER), 10) AS category_id FROM RDB$DATABASE'
+    Result := '''
+      SELECT CAST(:id AS INTEGER) AS id,
+      MOD(CAST(:id AS INTEGER), 10) AS category_id FROM RDB$DATABASE
+      '''
   else
     Result := 'SELECT :id AS id, :id % 10 AS category_id';
 end;
 
 function WorkingSet: UInt64;
-var C: TProcessMemoryCounters;
+var MemoryCounters: TProcessMemoryCounters;
 begin
-  ZeroMemory(@C, SizeOf(C)); C.cb := SizeOf(C);
-  if not GetProcessMemoryInfo(GetCurrentProcess, @C, SizeOf(C)) then RaiseLastOSError;
-  Result := C.WorkingSetSize;
+  ZeroMemory(@MemoryCounters, SizeOf(MemoryCounters)); MemoryCounters.cb := SizeOf(MemoryCounters);
+  if not GetProcessMemoryInfo(GetCurrentProcess, @MemoryCounters, SizeOf(MemoryCounters)) then RaiseLastOSError;
+  Result := MemoryCounters.WorkingSetSize;
 end;
 
 procedure RunNPlusOne;
 var
-  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q: TFDQuery;
+  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query: TFDQuery;
   Monitor: TFDMoniFlatFileClientLink; TraceEnabled: Boolean; TraceFile: string;
-  I, Calls, BatchCalls: Integer; SumN1, SumBatch: Int64;
-  T: TStopwatch; N1Us, BatchUs: Int64;
+  IterationIndex, Calls, BatchCalls: Integer; SumN1, SumBatch: Int64;
+  Timer: TStopwatch; N1Us, BatchUs: Int64;
 begin
   Link := TFDPhysFBDriverLink.Create(nil); Conn := TFDConnection.Create(nil);
   Monitor := TFDMoniFlatFileClientLink.Create(nil);
@@ -131,25 +135,25 @@ begin
       Conn.Params.Values['MonitorBy'] := 'FlatFile';
     end;
     Conn.Open;
-    Q := TFDQuery.Create(nil);
+    Query := TFDQuery.Create(nil);
     try
-      Q.Connection := Conn; Q.SQL.Text := DetailSql;
-      Calls := 0; SumN1 := 0; T := TStopwatch.StartNew;
-      for I := 1 to 100 do
+      Query.Connection := Conn; Query.SQL.Text := DetailSql;
+      Calls := 0; SumN1 := 0; Timer := TStopwatch.StartNew;
+      for IterationIndex := 1 to 100 do
       begin
-        Q.Close; Q.ParamByName('id').AsInteger := I; Q.Open;
-        Inc(SumN1, Q.FieldByName('category_id').AsInteger); Inc(Calls);
+        Query.Close; Query.ParamByName('id').AsInteger := IterationIndex; Query.Open;
+        Inc(SumN1, Query.FieldByName('category_id').AsInteger); Inc(Calls);
       end;
-      N1Us := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-      Q.Close; Q.SQL.Text := SyntheticSql; Q.ParamByName('row_count').AsInteger := 100;
-      SumBatch := 0; BatchCalls := 1; T := TStopwatch.StartNew; Q.Open;
-      while not Q.Eof do begin Inc(SumBatch, Q.FieldByName('category_id').AsInteger); Q.Next; end;
-      BatchUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      N1Us := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      Query.Close; Query.SQL.Text := SyntheticSql; Query.ParamByName('row_count').AsInteger := 100;
+      SumBatch := 0; BatchCalls := 1; Timer := TStopwatch.StartNew; Query.Open;
+      while not Query.Eof do begin Inc(SumBatch, Query.FieldByName('category_id').AsInteger); Query.Next; end;
+      BatchUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
       Check(SumN1 = SumBatch, 'N+1 e lote produziram resultados diferentes.');
       Check((Calls = 100) and (BatchCalls = 1), 'Contagem de comandos inesperada.');
       Writeln(Format('EX-18-01 n1_calls=%d batch_calls=%d checksum=%d n1_us=%d batch_us=%d',
         [Calls, BatchCalls, SumBatch, N1Us, BatchUs]));
-    finally Q.Free; end;
+    finally Query.Free; end;
   finally
     if TraceEnabled then Monitor.Tracing := False;
     Conn.Free; Monitor.Free; Link.Free;
@@ -159,111 +163,113 @@ end;
 procedure RunPrepare;
 const Iterations = 500;
 var
-  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q, Fresh: TFDQuery;
-  I: Integer; SumFresh, SumReuse, SumPrepared: Int64;
-  T: TStopwatch; FreshUs, ReuseUs, PreparedUs: Int64;
+  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query, Fresh: TFDQuery;
+  IterationIndex: Integer; SumFresh, SumReuse, SumPrepared: Int64;
+  Timer: TStopwatch; FreshUs, ReuseUs, PreparedUs: Int64;
 begin
   Link := TFDPhysFBDriverLink.Create(nil); Conn := NewConnection(Link);
   try
-    SumFresh := 0; T := TStopwatch.StartNew;
-    for I := 1 to Iterations do
+    SumFresh := 0; Timer := TStopwatch.StartNew;
+    for IterationIndex := 1 to Iterations do
     begin
       Fresh := TFDQuery.Create(nil);
       try
         Fresh.Connection := Conn; Fresh.SQL.Text := DetailSql;
-        Fresh.ParamByName('id').AsInteger := I; Fresh.Open;
+        Fresh.ParamByName('id').AsInteger := IterationIndex; Fresh.Open;
         Inc(SumFresh, Fresh.FieldByName('category_id').AsInteger);
       finally Fresh.Free; end;
     end;
-    FreshUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-    Q := TFDQuery.Create(nil);
+    FreshUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    Query := TFDQuery.Create(nil);
     try
-      Q.Connection := Conn; Q.SQL.Text := DetailSql; SumReuse := 0; T := TStopwatch.StartNew;
-      for I := 1 to Iterations do begin Q.Close; Q.ParamByName('id').AsInteger := I; Q.Open;
-        Inc(SumReuse, Q.FieldByName('category_id').AsInteger); end;
-      ReuseUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-      Q.Close; Q.Unprepare; Q.Prepare; SumPrepared := 0; T := TStopwatch.StartNew;
-      for I := 1 to Iterations do begin Q.Close; Q.ParamByName('id').AsInteger := I; Q.Open;
-        Inc(SumPrepared, Q.FieldByName('category_id').AsInteger); end;
-      PreparedUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      Query.Connection := Conn; Query.SQL.Text := DetailSql; SumReuse := 0; Timer := TStopwatch.StartNew;
+      for IterationIndex := 1 to Iterations do begin Query.Close; Query.ParamByName('id').AsInteger := IterationIndex; Query.Open;
+        Inc(SumReuse, Query.FieldByName('category_id').AsInteger); end;
+      ReuseUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      Query.Close; Query.Unprepare; Query.Prepare; SumPrepared := 0; Timer := TStopwatch.StartNew;
+      for IterationIndex := 1 to Iterations do begin Query.Close; Query.ParamByName('id').AsInteger := IterationIndex; Query.Open;
+        Inc(SumPrepared, Query.FieldByName('category_id').AsInteger); end;
+      PreparedUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
       Check((SumFresh = SumReuse) and (SumReuse = SumPrepared),
         'Variantes de prepare divergiram.');
       Writeln(Format(
         'EX-18-02 iterations=%d checksum=%d fresh_us=%d reuse_us=%d prepared_us=%d',
         [Iterations, SumPrepared, FreshUs, ReuseUs, PreparedUs]));
-    finally Q.Free; end;
+    finally Query.Free; end;
   finally Conn.Free; Link.Free; end;
 end;
 
 procedure RunFetch;
 var
-  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q: TFDQuery;
-  T: TStopwatch; OpenUs, TotalUs: Int64; InitialRows, Rows: Integer;
+  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query: TFDQuery;
+  Timer: TStopwatch; OpenUs, TotalUs: Int64; InitialRows, Rows: Integer;
   BeforeMem, AfterMem: UInt64;
 begin
   Link := TFDPhysFBDriverLink.Create(nil); Conn := NewConnection(Link);
   try
-    Q := TFDQuery.Create(nil);
+    Query := TFDQuery.Create(nil);
     try
-      Q.Connection := Conn; Q.FetchOptions.Mode := fmOnDemand; Q.FetchOptions.RowsetSize := 64;
-      Q.FetchOptions.AutoFetchAll := afDisable; Q.SQL.Text := SyntheticSql;
-      Q.ParamByName('row_count').AsInteger := 100000; BeforeMem := WorkingSet;
-      T := TStopwatch.StartNew; Q.Open; OpenUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-      InitialRows := Q.RecordCount; T := TStopwatch.StartNew; Q.FetchAll;
-      TotalUs := OpenUs + T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-      Rows := Q.RecordCount; AfterMem := WorkingSet;
+      Query.Connection := Conn; Query.FetchOptions.Mode := fmOnDemand; Query.FetchOptions.RowsetSize := 64;
+      Query.FetchOptions.AutoFetchAll := afDisable; Query.SQL.Text := SyntheticSql;
+      Query.ParamByName('row_count').AsInteger := 100000; BeforeMem := WorkingSet;
+      Timer := TStopwatch.StartNew; Query.Open; OpenUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      InitialRows := Query.RecordCount; Timer := TStopwatch.StartNew; Query.FetchAll;
+      TotalUs := OpenUs + Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+      Rows := Query.RecordCount; AfterMem := WorkingSet;
       Check((InitialRows > 0) and (InitialRows < Rows) and (Rows = 100000),
         'Fetch sob demanda não apresentou janela parcial seguida do total.');
       Writeln(Format('EX-18-03 open_us=%d total_us=%d initial_rows=%d rows=%d memory_delta=%d',
         [OpenUs, TotalUs, InitialRows, Rows, Int64(AfterMem) - Int64(BeforeMem)]));
-    finally Q.Free; end;
+    finally Query.Free; end;
   finally Conn.Free; Link.Free; end;
 end;
 
 procedure RunPlan;
 var
-  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q, P: TFDQuery; Plan: string;
+  Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query, PlanQuery: TFDQuery; Plan: string;
 begin
   Link := TFDPhysFBDriverLink.Create(nil); Conn := NewConnection(Link);
   try
-    Q := TFDQuery.Create(nil); P := TFDQuery.Create(nil);
+    Query := TFDQuery.Create(nil); PlanQuery := TFDQuery.Create(nil);
     try
-      Q.Connection := Conn; P.Connection := Conn;
+      Query.Connection := Conn; PlanQuery.Connection := Conn;
       if IsFirebird then
       begin
-        Q.SQL.Text := 'SELECT id FROM product /* CH18_PLAN_TARGET */ WHERE name = :name';
-        Q.ParamByName('name').AsString := 'Coffee'; Q.Prepare;
-        P.SQL.Text := 'SELECT FIRST 1 MON$EXPLAINED_PLAN FROM MON$COMPILED_STATEMENTS ' +
-          'WHERE MON$SQL_TEXT CONTAINING ''CH18_PLAN_TARGET''';
-        P.Open; Plan := P.Fields[0].AsString;
+        Query.SQL.Text := 'SELECT id FROM product /* CH18_PLAN_TARGET */ WHERE name = :name';
+        Query.ParamByName('name').AsString := 'Coffee'; Query.Prepare;
+        PlanQuery.SQL.Text := '''
+          SELECT FIRST 1 MON$EXPLAINED_PLAN FROM MON$COMPILED_STATEMENTS
+          WHERE MON$SQL_TEXT CONTAINING 'CH18_PLAN_TARGET'
+          ''';
+        PlanQuery.Open; Plan := PlanQuery.Fields[0].AsString;
       end
       else
       begin
-        P.SQL.Text := 'EXPLAIN QUERY PLAN SELECT id FROM product WHERE name = :name';
-        P.ParamByName('name').AsString := 'Coffee'; P.Open; Plan := P.Fields[P.FieldCount - 1].AsString;
+        PlanQuery.SQL.Text := 'EXPLAIN QUERY PLAN SELECT id FROM product WHERE name = :name';
+        PlanQuery.ParamByName('name').AsString := 'Coffee'; PlanQuery.Open; Plan := PlanQuery.Fields[PlanQuery.FieldCount - 1].AsString;
       end;
       Check(Plan <> '', 'SGBD não retornou plano.');
       Check(Pos('INDEX', UpperCase(Plan)) > 0, 'Plano não registrou acesso por índice: ' + Plan);
       Writeln('EX-18-04 plan=' + StringReplace(Plan, sLineBreak, ' | ', [rfReplaceAll]));
-    finally P.Free; Q.Free; end;
+    finally PlanQuery.Free; Query.Free; end;
   finally Conn.Free; Link.Free; end;
 end;
 
 procedure RunInfo;
 var
   Link: TFDPhysFBDriverLink; Conn: TFDConnection; Report: TStringList;
-  I: Integer; Sanitized: string;
+  IterationIndex: Integer; Sanitized: string;
 begin
   Link := TFDPhysFBDriverLink.Create(nil); Conn := NewConnection(Link); Report := TStringList.Create;
   try
     Conn.GetInfoReport(Report, [riFireDAC, riClient, riSession]);
     Check(Report.Count > 3, 'GetInfoReport retornou contexto insuficiente.');
     Sanitized := '';
-    for I := 0 to Report.Count - 1 do
-      if (Pos('Password', Report[I]) = 0) and (Pos('User_Name', Report[I]) = 0) and
-         (Pos('Database=', Report[I]) = 0) and (Pos('Client DLL name', Report[I]) = 0) and
-         (Pos('/tcp (', Report[I]) = 0) then
-        Sanitized := Sanitized + Report[I] + sLineBreak;
+    for IterationIndex := 0 to Report.Count - 1 do
+      if (Pos('Password', Report[IterationIndex]) = 0) and (Pos('User_Name', Report[IterationIndex]) = 0) and
+         (Pos('Database=', Report[IterationIndex]) = 0) and (Pos('Client DLL name', Report[IterationIndex]) = 0) and
+         (Pos('/tcp (', Report[IterationIndex]) = 0) then
+        Sanitized := Sanitized + Report[IterationIndex] + sLineBreak;
     Check(Pos('FireDAC', Sanitized) > 0, 'Relatório sanitizado perdeu versão FireDAC.');
     TFile.WriteAllText(RequiredEnvironment('CH18_INFO_FILE'), Sanitized, TEncoding.UTF8);
     Writeln(Format('EX-18-05 report_lines=%d sanitized_bytes=%d',
@@ -281,6 +287,6 @@ begin
     else if SameText(ParamStr(1), 'info') then RunInfo
     else raise Exception.Create('Modo inválido.');
   except
-    on E: Exception do begin Writeln(ErrOutput, E.ClassName, ': ', E.Message); ExitCode := 1; end;
+    on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end;
   end;
 end.

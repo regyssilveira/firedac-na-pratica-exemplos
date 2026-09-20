@@ -88,66 +88,66 @@ begin
 end;
 
 function HasName(AList: TStrings; const AName: string): Boolean;
-var I: Integer; S: string;
+var ListIndex: Integer; ListEntry: string;
 begin
   Result := False;
-  for I := 0 to AList.Count - 1 do
+  for ListIndex := 0 to AList.Count - 1 do
   begin
-    S := AList[I];
-    if SameText(S, AName) or SameText(S, '"' + AName + '"') or
-       (Pos(UpperCase(AName), UpperCase(S)) > 0) then Exit(True);
+    ListEntry := AList[ListIndex];
+    if SameText(ListEntry, AName) or SameText(ListEntry, '"' + AName + '"') or
+       (Pos(UpperCase(AName), UpperCase(ListEntry)) > 0) then Exit(True);
   end;
 end;
 
 procedure RunNames;
-var Link: TFDPhysFBDriverLink; C: TFDConnection; Catalogs, Schemas, Tables: TStringList;
+var Link: TFDPhysFBDriverLink; Connection: TFDConnection; Catalogs, Schemas, Tables: TStringList;
   ViewVisible: Boolean;
 begin
-  Link := TFDPhysFBDriverLink.Create(nil); C := NewConnection(Link);
+  Link := TFDPhysFBDriverLink.Create(nil); Connection := NewConnection(Link);
   Catalogs := TStringList.Create; Schemas := TStringList.Create; Tables := TStringList.Create;
   try
-    C.GetCatalogNames('%', Catalogs); C.GetSchemaNames('', '%', Schemas);
-    C.GetTableNames('', '', '%', Tables, [osMy, osOther], [tkTable, tkView], False);
+    Connection.GetCatalogNames('%', Catalogs); Connection.GetSchemaNames('', '%', Schemas);
+    Connection.GetTableNames('', '', '%', Tables, [osMy, osOther], [tkTable, tkView], False);
     Check(HasName(Tables, 'PRODUCT'), 'Tabela product não apareceu no metadata.');
     ViewVisible := HasName(Tables, 'ORDER_TOTAL_VIEW');
     if not IsFirebird then Check(ViewVisible, 'View SQLite conhecida não apareceu.');
     Writeln(Format('EX-20-01 catalogs=%d schemas=%d tables_views=%d product=True view_visible=%s',
       [Catalogs.Count, Schemas.Count, Tables.Count, BoolToStr(ViewVisible, True)]));
-  finally Tables.Free; Schemas.Free; Catalogs.Free; C.Free; Link.Free; end;
+  finally Tables.Free; Schemas.Free; Catalogs.Free; Connection.Free; Link.Free; end;
 end;
 
 procedure RunStructure;
-var Link: TFDPhysFBDriverLink; C: TFDConnection; Fields, Keys, Indexes: TStringList;
+var Link: TFDPhysFBDriverLink; Connection: TFDConnection; Fields, Keys, Indexes: TStringList;
 begin
-  Link := TFDPhysFBDriverLink.Create(nil); C := NewConnection(Link);
+  Link := TFDPhysFBDriverLink.Create(nil); Connection := NewConnection(Link);
   Fields := TStringList.Create; Keys := TStringList.Create; Indexes := TStringList.Create;
   try
-    C.GetFieldNames('', '', 'PRODUCT', '%', Fields);
-    C.GetKeyFieldNames('', '', 'PRODUCT', '%', Keys);
-    C.GetIndexNames('', '', 'PRODUCT', '%', Indexes);
+    Connection.GetFieldNames('', '', 'PRODUCT', '%', Fields);
+    Connection.GetKeyFieldNames('', '', 'PRODUCT', '%', Keys);
+    Connection.GetIndexNames('', '', 'PRODUCT', '%', Indexes);
     Check(HasName(Fields, 'ID') and HasName(Fields, 'SKU') and HasName(Fields, 'NAME'),
       'Campos esperados de product ausentes.');
     Check(HasName(Keys, 'ID'), 'Chave ID ausente.');
     Check(HasName(Indexes, 'IX_PRODUCT_NAME'), 'Índice IX_PRODUCT_NAME ausente.');
     Writeln(Format('EX-20-02 fields=%d keys=%d indexes=%d',
       [Fields.Count, Keys.Count, Indexes.Count]));
-  finally Indexes.Free; Keys.Free; Fields.Free; C.Free; Link.Free; end;
+  finally Indexes.Free; Keys.Free; Fields.Free; Connection.Free; Link.Free; end;
 end;
 
 procedure RunRoutines;
-var Link: TFDPhysFBDriverLink; C: TFDConnection; Routines, Generators: TStringList;
+var Link: TFDPhysFBDriverLink; Connection: TFDConnection; Routines, Generators: TStringList;
   Meta: TFDMetaInfoQuery; ArgCount: Integer;
 begin
-  Link := TFDPhysFBDriverLink.Create(nil); C := NewConnection(Link);
+  Link := TFDPhysFBDriverLink.Create(nil); Connection := NewConnection(Link);
   Routines := TStringList.Create; Generators := TStringList.Create;
   Meta := TFDMetaInfoQuery.Create(nil);
   try
-    C.GetStoredProcNames('', '', '', '%', Routines, [osMy, osOther], False);
-    C.GetGeneratorNames('', '', '%', Generators, [osMy, osOther], False);
+    Connection.GetStoredProcNames('', '', '', '%', Routines, [osMy, osOther], False);
+    Connection.GetGeneratorNames('', '', '%', Generators, [osMy, osOther], False);
     if IsFirebird then
     begin
       Check(HasName(Routines, 'GET_ORDER_STATE'), 'Procedure GET_ORDER_STATE ausente.');
-      Meta.Connection := C; Meta.MetaInfoKind := mkProcArgs;
+      Meta.Connection := Connection; Meta.MetaInfoKind := mkProcArgs;
       Meta.ObjectName := 'GET_ORDER_STATE'; Meta.Open; ArgCount := Meta.RecordCount;
       Check(ArgCount = 3, 'GET_ORDER_STATE deveria expor três argumentos.');
     end
@@ -158,18 +158,18 @@ begin
     end;
     Writeln(Format('EX-20-03 routines=%d generators=%d known_args=%d',
       [Routines.Count, Generators.Count, ArgCount]));
-  finally Meta.Free; Generators.Free; Routines.Free; C.Free; Link.Free; end;
+  finally Meta.Free; Generators.Free; Routines.Free; Connection.Free; Link.Free; end;
 end;
 
 procedure RunExplorer;
-var Link: TFDPhysFBDriverLink; C: TFDConnection; TablesMeta, FieldsMeta: TFDMetaInfoQuery;
-  Q: TFDQuery; Found: Boolean; SnapshotTables, SnapshotFields, PreviewRows: Integer;
+var Link: TFDPhysFBDriverLink; Connection: TFDConnection; TablesMeta, FieldsMeta: TFDMetaInfoQuery;
+  Query: TFDQuery; Found: Boolean; SnapshotTables, SnapshotFields, PreviewRows: Integer;
 begin
-  Link := TFDPhysFBDriverLink.Create(nil); C := NewConnection(Link);
+  Link := TFDPhysFBDriverLink.Create(nil); Connection := NewConnection(Link);
   TablesMeta := TFDMetaInfoQuery.Create(nil); FieldsMeta := TFDMetaInfoQuery.Create(nil);
-  Q := TFDQuery.Create(nil);
+  Query := TFDQuery.Create(nil);
   try
-    TablesMeta.Connection := C; TablesMeta.MetaInfoKind := mkTables;
+    TablesMeta.Connection := Connection; TablesMeta.MetaInfoKind := mkTables;
     TablesMeta.ObjectScopes := [osMy, osOther];
     TablesMeta.TableKinds := [tkTable, tkView]; TablesMeta.Open;
     SnapshotTables := TablesMeta.RecordCount; Found := False; TablesMeta.First;
@@ -178,17 +178,17 @@ begin
       TablesMeta.Next;
     end;
     Check(Found, 'Allowlist de metadata não contém PRODUCT.');
-    FieldsMeta.Connection := C; FieldsMeta.MetaInfoKind := mkTableFields;
+    FieldsMeta.Connection := Connection; FieldsMeta.MetaInfoKind := mkTableFields;
     FieldsMeta.ObjectName := 'PRODUCT'; FieldsMeta.Open; SnapshotFields := FieldsMeta.RecordCount;
     Check(SnapshotFields >= 6, 'Snapshot de campos incompleto.');
-    Q.Connection := C;
-    if IsFirebird then Q.SQL.Text := 'SELECT ID, SKU, NAME FROM PRODUCT ROWS 2'
-    else Q.SQL.Text := 'SELECT ID, SKU, NAME FROM PRODUCT LIMIT 2';
-    Q.Open; Q.FetchAll; PreviewRows := Q.RecordCount;
+    Query.Connection := Connection;
+    if IsFirebird then Query.SQL.Text := 'SELECT ID, SKU, NAME FROM PRODUCT ROWS 2'
+    else Query.SQL.Text := 'SELECT ID, SKU, NAME FROM PRODUCT LIMIT 2';
+    Query.Open; Query.FetchAll; PreviewRows := Query.RecordCount;
     Check(PreviewRows = 2, 'Preview não respeitou limite de duas linhas.');
     Writeln(Format('EX-20-04 snapshot_tables=%d snapshot_fields=%d preview_rows=%d allowlisted=True',
       [SnapshotTables, SnapshotFields, PreviewRows]));
-  finally Q.Free; FieldsMeta.Free; TablesMeta.Free; C.Free; Link.Free; end;
+  finally Query.Free; FieldsMeta.Free; TablesMeta.Free; Connection.Free; Link.Free; end;
 end;
 
 procedure WaitAlerts(AProbe: TAlertProbe; AExpected: Integer; ATimeout: Cardinal);
@@ -199,10 +199,10 @@ begin
   until (AProbe.Count >= AExpected) or (GetTickCount64 >= Deadline);
 end;
 
-procedure CleanEventFixture(C: TFDConnection);
+procedure CleanEventFixture(Connection: TFDConnection);
 begin
-  C.ExecSQL('DELETE FROM outbox_event WHERE aggregate_id = 201001');
-  C.ExecSQL('DELETE FROM sales_order WHERE id = 201001');
+  Connection.ExecSQL('DELETE FROM outbox_event WHERE aggregate_id = 201001');
+  Connection.ExecSQL('DELETE FROM sales_order WHERE id = 201001');
 end;
 
 procedure RunEvents;
@@ -216,8 +216,10 @@ begin
   OtherAlerter := nil;
   try
     CleanEventFixture(Other);
-    Other.ExecSQL('INSERT INTO sales_order (id,idempotency_key,order_status,total) ' +
-      'VALUES (201001,''EX-20-EVENT'',''PENDING'',0)');
+    Other.ExecSQL('''
+      INSERT INTO sales_order (id,idempotency_key,order_status,total)
+      VALUES (201001,'EX-20-EVENT','PENDING',0)
+      ''');
     Alerter.Connection := Main; Alerter.Names.Add('ORDER_CLOSED');
     Alerter.Options.Synchronize := True; Alerter.Options.Timeout := 250;
     Alerter.OnAlert := Probe.Alert; Alerter.Register; Sleep(150);
@@ -245,9 +247,11 @@ begin
     else Check(Probe.Count > BeforeRollback, 'Evento local SQLite não mostrou independência da transação.');
 
     Alerter.Unregister; BeforeOffline := Probe.Count;
-    Other.ExecSQL('INSERT INTO outbox_event ' +
-      '(aggregate_type,aggregate_id,event_type,payload) VALUES ' +
-      '(''SALES_ORDER'',201001,''ORDER_CLOSED'',''EX-20-OFFLINE'')');
+    Other.ExecSQL('''
+      INSERT INTO outbox_event
+      (aggregate_type,aggregate_id,event_type,payload) VALUES
+      ('SALES_ORDER',201001,'ORDER_CLOSED','EX-20-OFFLINE')
+      ''');
     if IsFirebird then
     begin
       Other.ExecSQL('UPDATE sales_order SET order_status=''PENDING'' WHERE id=201001');
@@ -285,6 +289,6 @@ begin
     else if SameText(ParamStr(1), 'events') then RunEvents
     else raise Exception.Create('Modo inválido.');
   except
-    on E: Exception do begin Writeln(ErrOutput, E.ClassName, ': ', E.Message); ExitCode := 1; end;
+    on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end;
   end;
 end.

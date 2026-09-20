@@ -114,8 +114,8 @@ begin
         PreviousKey := '';
         while not Query.Eof do
         begin
-          CurrentKey := Query.FieldByName('name').AsString + '|' +
-            Format('%.20d', [Query.FieldByName('id').AsLargeInt]);
+          CurrentKey := Format('%s|%.20d', [Query.FieldByName('name').AsString,
+            Query.FieldByName('id').AsLargeInt]);
           Check((PreviousKey = '') or (CompareStr(PreviousKey, CurrentKey) <= 0),
             'A lista não respeitou ORDER BY name, id.');
           PreviousKey := CurrentKey;
@@ -217,8 +217,10 @@ begin
       try
         Query.Connection := Connection;
         Query.SQL.Text :=
-          'INSERT INTO product (sku, name, category_id, price, active) ' +
-          'VALUES (:sku, :name, :category_id, :price, :active) RETURNING id';
+          '''
+            INSERT INTO product (sku, name, category_id, price, active)
+            VALUES (:sku, :name, :category_id, :price, :active) RETURNING id
+            ''';
         Query.ParamByName('sku').AsString := 'CH05-KEY-' + IntToStr(GetCurrentProcessId);
         Query.ParamByName('name').AsString := 'Produto com chave gerada';
         Query.ParamByName('category_id').AsLargeInt := 1;
@@ -252,20 +254,24 @@ begin
     Query.Connection := Connection;
     if IsFirebird then
       Query.SQL.Text :=
-        'SELECT id, name FROM product WHERE active = TRUE ORDER BY name, id ' +
-        'OFFSET :row_offset ROWS FETCH NEXT :page_size ROWS ONLY'
+        '''
+          SELECT id, name FROM product WHERE active = TRUE ORDER BY name, id
+          OFFSET :row_offset ROWS FETCH NEXT :page_size ROWS ONLY
+          '''
     else
       Query.SQL.Text :=
-        'SELECT id, name FROM product WHERE active = 1 ORDER BY name, id ' +
-        'LIMIT :page_size OFFSET :row_offset';
+        '''
+          SELECT id, name FROM product WHERE active = 1 ORDER BY name, id
+          LIMIT :page_size OFFSET :row_offset
+          ''';
     Query.ParamByName('row_offset').AsInteger := AOffset;
     Query.ParamByName('page_size').AsInteger := APageSize;
     Query.Open;
     while not Query.Eof do
     begin
       AIds.Add(Query.FieldByName('id').AsLargeInt);
-      AKeys.Add(Query.FieldByName('name').AsString + '|' +
-        Format('%.20d', [Query.FieldByName('id').AsLargeInt]));
+      AKeys.Add(Format('%s|%.20d', [Query.FieldByName('name').AsString,
+        Query.FieldByName('id').AsLargeInt]));
       Query.Next;
     end;
   finally
@@ -283,14 +289,18 @@ begin
     Query.Connection := Connection;
     if IsFirebird then
       Query.SQL.Text :=
-        'SELECT id, name FROM product WHERE active = TRUE AND ' +
-        '((name > :last_name) OR (name = :last_name AND id > :last_id)) ' +
-        'ORDER BY name, id FETCH FIRST :page_size ROWS ONLY'
+        '''
+          SELECT id, name FROM product WHERE active = TRUE AND
+          ((name > :last_name) OR (name = :last_name AND id > :last_id))
+          ORDER BY name, id FETCH FIRST :page_size ROWS ONLY
+          '''
     else
       Query.SQL.Text :=
-        'SELECT id, name FROM product WHERE active = 1 AND ' +
-        '((name > :last_name) OR (name = :last_name AND id > :last_id)) ' +
-        'ORDER BY name, id LIMIT :page_size';
+        '''
+          SELECT id, name FROM product WHERE active = 1 AND
+          ((name > :last_name) OR (name = :last_name AND id > :last_id))
+          ORDER BY name, id LIMIT :page_size
+          ''';
     Query.ParamByName('last_name').AsString := ALastName;
     Query.ParamByName('last_id').AsLargeInt := ALastId;
     Query.ParamByName('page_size').AsInteger := APageSize;
@@ -312,7 +322,7 @@ begin
     var
       Page1, Page2, Keyset2: TList<Int64>;
       Keys1, Keys2: TList<string>;
-      I: Integer;
+      Index: Integer;
       LastName: string;
       LastId: Int64;
     begin
@@ -324,21 +334,25 @@ begin
       Connection.StartTransaction;
       try
         Connection.ExecSQL(
-          'INSERT INTO product (id, sku, name, category_id, price, active) ' +
-          'VALUES (:id, :sku, :name, :category_id, :price, :active)',
+          '''
+            INSERT INTO product (id, sku, name, category_id, price, active)
+            VALUES (:id, :sku, :name, :category_id, :price, :active)
+            ''',
           [9001, 'CH05-PAGE-A', 'Produto repetido', 1, 1.00, True]);
         Connection.ExecSQL(
-          'INSERT INTO product (id, sku, name, category_id, price, active) ' +
-          'VALUES (:id, :sku, :name, :category_id, :price, :active)',
+          '''
+            INSERT INTO product (id, sku, name, category_id, price, active)
+            VALUES (:id, :sku, :name, :category_id, :price, :active)
+            ''',
           [9002, 'CH05-PAGE-B', 'Produto repetido', 1, 2.00, True]);
         ReadPage(Connection, 0, 3, Page1, Keys1);
         ReadPage(Connection, 3, 3, Page2, Keys2);
         Check((Page1.Count = 3) and (Page2.Count = 2),
           'As páginas não dividiram as 5 linhas em 3 + 2.');
-        for I := 0 to Page1.Count - 1 do
-          Check(not Page2.Contains(Page1[I]), 'As páginas por offset se sobrepõem.');
-        for I := 1 to Keys1.Count - 1 do
-          Check(CompareStr(Keys1[I - 1], Keys1[I]) <= 0,
+        for Index := 0 to Page1.Count - 1 do
+          Check(not Page2.Contains(Page1[Index]), 'As páginas por offset se sobrepõem.');
+        for Index := 1 to Keys1.Count - 1 do
+          Check(CompareStr(Keys1[Index - 1], Keys1[Index]) <= 0,
             'A primeira página não está ordenada.');
         Check(CompareStr(Keys1.Last, Keys2.First) <= 0,
           'A fronteira entre as páginas não está ordenada.');
@@ -347,8 +361,8 @@ begin
         ReadKeysetPage(Connection, LastName, LastId, 3, Keyset2);
         Check((Keyset2.Count = Page2.Count),
           'A segunda página keyset tem tamanho divergente.');
-        for I := 0 to Page2.Count - 1 do
-          Check(Page2[I] = Keyset2[I],
+        for Index := 0 to Page2.Count - 1 do
+          Check(Page2[Index] = Keyset2[Index],
             'Offset e keyset divergiram sem mutação concorrente.');
         Writeln('EX-05-05 aprovado: offset e keyset produziram fronteira estável.');
       finally
@@ -366,23 +380,25 @@ end;
 procedure PreparePaginationMass(AConnection: TFDConnection; ACount: Integer);
 var
   Query: TFDQuery;
-  I: Integer;
+  Index: Integer;
 begin
   Query := TFDQuery.Create(nil);
   try
     Query.Connection := AConnection;
     Query.SQL.Text :=
-      'INSERT INTO product (id, sku, name, category_id, price, active) ' +
-      'VALUES (:id, :sku, :name, :category_id, :price, :active)';
+      '''
+        INSERT INTO product (id, sku, name, category_id, price, active)
+        VALUES (:id, :sku, :name, :category_id, :price, :active)
+        ''';
     Query.Params.ArraySize := ACount;
-    for I := 0 to ACount - 1 do
+    for Index := 0 to ACount - 1 do
     begin
-      Query.ParamByName('id').AsLargeInts[I] := 100000 + Int64(I) * 2;
-      Query.ParamByName('sku').AsStrings[I] := Format('BM03-%.6d', [I]);
-      Query.ParamByName('name').AsStrings[I] := Format('Página %.6d', [I]);
-      Query.ParamByName('category_id').AsLargeInts[I] := 1;
-      Query.ParamByName('price').AsCurrencys[I] := 1;
-      Query.ParamByName('active').AsBooleans[I] := True;
+      Query.ParamByName('id').AsLargeInts[Index] := 100000 + Int64(Index) * 2;
+      Query.ParamByName('sku').AsStrings[Index] := Format('BM03-%.6d', [Index]);
+      Query.ParamByName('name').AsStrings[Index] := Format('Página %.6d', [Index]);
+      Query.ParamByName('category_id').AsLargeInts[Index] := 1;
+      Query.ParamByName('price').AsCurrencys[Index] := 1;
+      Query.ParamByName('active').AsBooleans[Index] := True;
     end;
     Query.Execute(ACount, 0);
   finally
@@ -405,21 +421,29 @@ begin
     if AUseKeyset then
     begin
       if IsFirebird then
-        Query.SQL.Text := 'SELECT id FROM product WHERE id > :last_id ' +
-          'ORDER BY id FETCH FIRST :page_size ROWS ONLY'
+        Query.SQL.Text := '''
+          SELECT id FROM product WHERE id > :last_id
+          ORDER BY id FETCH FIRST :page_size ROWS ONLY
+          '''
       else
-        Query.SQL.Text := 'SELECT id FROM product WHERE id > :last_id ' +
-          'ORDER BY id LIMIT :page_size';
+        Query.SQL.Text := '''
+          SELECT id FROM product WHERE id > :last_id
+          ORDER BY id LIMIT :page_size
+          ''';
       Query.ParamByName('last_id').AsLargeInt := ALastId;
     end
     else
     begin
       if IsFirebird then
-        Query.SQL.Text := 'SELECT id FROM product WHERE id >= 100000 ORDER BY id ' +
-          'OFFSET :row_offset ROWS FETCH NEXT :page_size ROWS ONLY'
+        Query.SQL.Text := '''
+          SELECT id FROM product WHERE id >= 100000 ORDER BY id
+          OFFSET :row_offset ROWS FETCH NEXT :page_size ROWS ONLY
+          '''
       else
-        Query.SQL.Text := 'SELECT id FROM product WHERE id >= 100000 ORDER BY id ' +
-          'LIMIT :page_size OFFSET :row_offset';
+        Query.SQL.Text := '''
+          SELECT id FROM product WHERE id >= 100000 ORDER BY id
+          LIMIT :page_size OFFSET :row_offset
+          ''';
       Query.ParamByName('row_offset').AsInteger := AOffset;
     end;
     Query.ParamByName('page_size').AsInteger := CPageSize;
@@ -463,8 +487,10 @@ begin
           'Offset e keyset divergiram antes da escrita concorrente simulada.');
 
         Connection.ExecSQL(
-          'INSERT INTO product (id, sku, name, category_id, price, active) ' +
-          'VALUES (100001, ''BM03-INSERT'', ''Inserido antes da fronteira'', 1, 1, :active)',
+          '''
+            INSERT INTO product (id, sku, name, category_id, price, active)
+            VALUES (100001, 'BM03-INSERT', 'Inserido antes da fronteira', 1, 1, :active)
+            ''',
           [True]);
         MeasurePaginationPage(Connection, False, COffset, 0,
           IgnoredUs, MutatedOffsetFirst, MutatedOffsetLast, Count);
@@ -475,8 +501,7 @@ begin
         Check((MutatedKeysetFirst = KeysetFirst) and
           (MutatedKeysetLast = KeysetLast),
           'Keyset mudou após inserção anterior à fronteira.');
-        Writeln(Format('BM-03 rows=%d offset=%d page_size=50 offset_us=%d ' +
-          'keyset_us=%d first_id=%d offset_stable=False keyset_stable=True',
+        Writeln(Format('BM-03 rows=%d offset=%d page_size=50 offset_us=%d keyset_us=%d first_id=%d offset_stable=False keyset_stable=True',
           [CRowCount, COffset, OffsetUs, KeysetUs, KeysetFirst]));
       finally
         if Connection.InTransaction then
@@ -515,9 +540,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

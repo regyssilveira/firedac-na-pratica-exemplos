@@ -121,20 +121,20 @@ procedure FillInsertParams(AQuery: TFDQuery; ACount: Integer;
   AFirstId: Int64 = 130001);
 begin
   AQuery.Params.ArraySize := ACount;
-  for var I := 0 to ACount - 1 do
+  for var Index := 0 to ACount - 1 do
   begin
-    var SkuIndex := I;
-    if I = ADuplicateIndex then
+    var SkuIndex := Index;
+    if Index = ADuplicateIndex then
       SkuIndex := 0;
-    AQuery.ParamByName('id').AsLargeInts[I] := AFirstId + I;
-    AQuery.ParamByName('sku').AsStrings[I] :=
+    AQuery.ParamByName('id').AsLargeInts[Index] := AFirstId + Index;
+    AQuery.ParamByName('sku').AsStrings[Index] :=
       Format('%s-%.6d', [ASkuPrefix, SkuIndex]);
-    AQuery.ParamByName('name').AsStrings[I] :=
-      Format('Produto de carga %.6d', [I]);
-    AQuery.ParamByName('category_id').AsLargeInts[I] := 1;
-    AQuery.ParamByName('price').AsCurrencys[I] := 10 + (I mod 100) / 10;
-    AQuery.ParamByName('active').AsBooleans[I] := True;
-    AQuery.ParamByName('version').AsLargeInts[I] := 1;
+    AQuery.ParamByName('name').AsStrings[Index] :=
+      Format('Produto de carga %.6d', [Index]);
+    AQuery.ParamByName('category_id').AsLargeInts[Index] := 1;
+    AQuery.ParamByName('price').AsCurrencys[Index] := 10 + (Index mod 100) / 10;
+    AQuery.ParamByName('active').AsBooleans[Index] := True;
+    AQuery.ParamByName('version').AsLargeInts[Index] := 1;
   end;
 end;
 
@@ -146,7 +146,7 @@ var
   Connection: TFDConnection;
   Query: TFDQuery;
   Stopwatch: TStopwatch;
-  I: Integer;
+  Index: Integer;
   ElapsedMs, RowsPerSecond: Double;
   DriverName, Architecture: string;
 begin
@@ -169,13 +169,13 @@ begin
       if SameText(AMethod, 'array') then
         Query.Execute(ACount, 0)
       else
-        for I := 0 to ACount - 1 do
+        for Index := 0 to ACount - 1 do
         begin
-          Query.ParamByName('id').AsLargeInt := CFirstId + I;
-          Query.ParamByName('sku').AsString := Format('EX13BM-L-%.6d', [I]);
-          Query.ParamByName('name').AsString := Format('Produto benchmark %.6d', [I]);
+          Query.ParamByName('id').AsLargeInt := CFirstId + Index;
+          Query.ParamByName('sku').AsString := Format('EX13BM-L-%.6d', [Index]);
+          Query.ParamByName('name').AsString := Format('Produto benchmark %.6d', [Index]);
           Query.ParamByName('category_id').AsLargeInt := 1;
-          Query.ParamByName('price').AsCurrency := 10 + (I mod 100) / 10;
+          Query.ParamByName('price').AsCurrency := 10 + (Index mod 100) / 10;
           Query.ParamByName('active').AsBoolean := True;
           Query.ParamByName('version').AsLargeInt := 1;
           Query.ExecSQL;
@@ -257,7 +257,7 @@ var
   Query: TFDQuery;
   Failed: Boolean;
   ErrorSummary: string;
-  I: Integer;
+  Index: Integer;
 begin
   Link := TFDPhysFBDriverLink.Create(nil);
   Connection := NewConnection(Link);
@@ -274,13 +274,13 @@ begin
       try
         Query.Execute(CCount, 0);
       except
-        on E: EFDDBEngineException do
+        on CaughtException: EFDDBEngineException do
         begin
           Failed := True;
-          for I := 0 to E.ErrorCount - 1 do
+          for Index := 0 to CaughtException.ErrorCount - 1 do
           begin
             if ErrorSummary <> '' then ErrorSummary := ErrorSummary + ',';
-            ErrorSummary := ErrorSummary + IntToStr(E.Errors[I].RowIndex);
+            ErrorSummary := ErrorSummary + IntToStr(CaughtException.Errors[Index].RowIndex);
           end;
         end;
       end;
@@ -344,10 +344,12 @@ begin
     Writer.Connection := Connection;
     Writer.TableName := 'product';
     Writer.WriteSQL :=
-      'INSERT INTO product ' +
-      '(id, sku, name, category_id, price, active, version) ' +
-      'VALUES (:id, :sku, :name, :category_id, :price, ' +
-      'CASE WHEN :active = 1 THEN TRUE ELSE FALSE END, :version)';
+      '''
+        INSERT INTO product
+        (id, sku, name, category_id, price, active, version)
+        VALUES (:id, :sku, :name, :category_id, :price,
+        CASE WHEN :active = 1 THEN TRUE ELSE FALSE END, :version)
+        ''';
     Batch.Mode := dmAlwaysInsert;
     Batch.CommitCount := 100;
     Batch.Execute;
@@ -369,20 +371,21 @@ begin
   end;
 end;
 
-procedure PrepareTransferSource(AConnection: TFDConnection; ASourceIsFirebird: Boolean);
-var
-  ActiveLiteral: string;
+procedure PrepareTransferSource(AConnection: TFDConnection);
 begin
   DeleteProducts(AConnection, 134001, 134002);
-  if ASourceIsFirebird then ActiveLiteral := 'TRUE' else ActiveLiteral := '1';
   AConnection.ExecSQL(
-    'INSERT INTO product (id, sku, name, category_id, price, active, version) ' +
-    'VALUES (134001, ''EX13MOVE-001'', ''Origem caf' + #$00E9 + ''', 2, 12.34, ' +
-    ActiveLiteral + ', 1)');
+    '''
+      INSERT INTO product (id, sku, name, category_id, price, active, version)
+      VALUES (:id, :sku, :name, :category_id, :price, :active, :version)
+      ''',
+    [134001, 'EX13MOVE-001', 'Origem caf' + #$00E9, 2, 12.34, True, 1]);
   AConnection.ExecSQL(
-    'INSERT INTO product (id, sku, name, category_id, price, active, version) ' +
-    'VALUES (134002, ''EX13MOVE-002'', ''Origem teclado'', 1, 98.76, ' +
-    ActiveLiteral + ', 1)');
+    '''
+      INSERT INTO product (id, sku, name, category_id, price, active, version)
+      VALUES (:id, :sku, :name, :category_id, :price, :active, :version)
+      ''',
+    [134002, 'EX13MOVE-002', 'Origem teclado', 1, 98.76, True, 1]);
 end;
 
 procedure RunTransfer;
@@ -401,17 +404,21 @@ begin
   Writer := TFDBatchMoveSQLWriter.Create(Batch);
   try
     DeleteProducts(Dest, 134001, 134002);
-    PrepareTransferSource(Source, not IsFirebird);
+    PrepareTransferSource(Source);
     Reader.Connection := Source;
     Reader.ReadSQL :=
-      'SELECT id, sku, name, category_id, price, version ' +
-      'FROM product WHERE id BETWEEN 134001 AND 134002 ORDER BY id';
+      '''
+        SELECT id, sku, name, category_id, price, version
+        FROM product WHERE id BETWEEN 134001 AND 134002 ORDER BY id
+        ''';
     Writer.Connection := Dest;
     Writer.TableName := 'product';
     Writer.WriteSQL :=
-      'INSERT INTO product ' +
-      '(id, sku, name, category_id, price, version) ' +
-      'VALUES (:id, :sku, :name, :category_id, :price, :version)';
+      '''
+        INSERT INTO product
+        (id, sku, name, category_id, price, version)
+        VALUES (:id, :sku, :name, :category_id, :price, :version)
+        ''';
     Batch.Mode := dmAlwaysInsert;
     Batch.CommitCount := 100;
     Batch.Execute;
@@ -463,9 +470,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

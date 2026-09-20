@@ -47,9 +47,9 @@ begin
         'SELECT RDB$GET_CONTEXT(''SYSTEM'', ''ENGINE_VERSION'') FROM RDB$DATABASE');
       Writeln('FireDAC conectado ao Firebird ', EngineVersion);
     except
-      on E: Exception do
+      on CaughtException: Exception do
       begin
-        Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+        Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
         ExitCode := 1;
       end;
     end;

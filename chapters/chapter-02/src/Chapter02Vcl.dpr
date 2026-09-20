@@ -44,12 +44,12 @@ begin
         Application.Run;
       end;
     except
-      on E: Exception do
+      on CaughtException: Exception do
       begin
         ExitCode := 1;
         ResultFile := GetEnvironmentVariable('CH02_AUTORUN_RESULT');
         if ResultFile <> '' then
-          TFile.WriteAllText(ResultFile, E.ClassName + ': ' + E.Message,
+          TFile.WriteAllText(ResultFile, CaughtException.ClassName + ': ' + CaughtException.Message,
             TEncoding.UTF8);
       end;
     end;

@@ -39,9 +39,8 @@ type
 procedure TCalcContext.Calculate(DataSet: TDataSet);
 begin
   Inc(Calls);
-  DataSet.FieldByName('display_name').AsString :=
-    DataSet.FieldByName('sku').AsString + ' - ' +
-    DataSet.FieldByName('name').AsString;
+  DataSet.FieldByName('display_name').AsString := Format('%s - %s',
+    [DataSet.FieldByName('sku').AsString, DataSet.FieldByName('name').AsString]);
 end;
 
 procedure Check(ACondition: Boolean; const AMessage: string);
@@ -121,10 +120,10 @@ end;
 
 procedure AddPhysicalFields(AMemTable: TFDMemTable);
 var
-  I: Integer;
+  Index: Integer;
 begin
-  for I := 0 to AMemTable.FieldDefs.Count - 1 do
-    AMemTable.FieldDefs[I].CreateField(AMemTable);
+  for Index := 0 to AMemTable.FieldDefs.Count - 1 do
+    AMemTable.FieldDefs[Index].CreateField(AMemTable);
 end;
 
 procedure RunCalculated;
@@ -264,9 +263,11 @@ begin
         Query.UpdateOptions.KeyFields := 'id';
         Query.UpdateOptions.UpdateMode := upWhereKeyOnly;
         Query.SQL.Text :=
-          'SELECT p.id, p.sku, p.name, p.price, p.category_id, ' +
-          'c.name AS category_name, p.version FROM product p ' +
-          'JOIN category c ON c.id = p.category_id WHERE p.id = :id';
+          '''
+            SELECT p.id, p.sku, p.name, p.price, p.category_id,
+            c.name AS category_name, p.version FROM product p
+            JOIN category c ON c.id = p.category_id WHERE p.id = :id
+            ''';
         Query.ParamByName('id').AsLargeInt := 1;
         Query.Open;
         Query.FieldByName('category_name').ProviderFlags := [];
@@ -297,8 +298,10 @@ procedure ConfigureExplicitUpdate(AQuery: TFDQuery; AUpdateSQL: TFDUpdateSQL);
 begin
   AUpdateSQL.Connection := AQuery.Connection;
   AUpdateSQL.ModifySQL.Text :=
-    'UPDATE product SET price = :NEW_price, version = :OLD_version + 1 ' +
-    'WHERE id = :OLD_id AND version = :OLD_version';
+    '''
+      UPDATE product SET price = :NEW_price, version = :OLD_version + 1
+      WHERE id = :OLD_id AND version = :OLD_version
+      ''';
   AQuery.UpdateObject := AUpdateSQL;
 end;
 
@@ -344,10 +347,10 @@ begin
       Query.FieldByName('price').AsCurrency := OriginalPrice + 2;
       Query.Post;
     except
-      on E: EFDException do
+      on CaughtException: EFDException do
       begin
         ConflictRaised := True;
-        ConflictMessage := E.Message;
+        ConflictMessage := CaughtException.Message;
         if Query.State in dsEditModes then
           Query.Cancel;
       end;
@@ -404,9 +407,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

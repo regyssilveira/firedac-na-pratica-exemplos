@@ -109,16 +109,16 @@ begin
 end;
 
 procedure ConfigureDirect(AConnection: TFDConnection; ALink: TFDPhysFBDriverLink);
-var P: TStringList;
+var ConnectionParams: TStringList;
 begin
   AConnection.LoginPrompt := False;
   if IsFirebird then ALink.VendorLib := RequiredEnvironment('FIRESTORE_FBCLIENT');
-  P := TStringList.Create;
+  ConnectionParams := TStringList.Create;
   try
-    FillParams(P, False, 0);
-    P.Values['DriverID'] := IfThen(IsFirebird, 'FB', 'SQLite');
-    AConnection.Params.Assign(P);
-  finally P.Free; end;
+    FillParams(ConnectionParams, False, 0);
+    ConnectionParams.Values['DriverID'] := IfThen(IsFirebird, 'FB', 'SQLite');
+    AConnection.Params.Assign(ConnectionParams);
+  finally ConnectionParams.Free; end;
 end;
 
 function NewDirect(ALink: TFDPhysFBDriverLink): TFDConnection;
@@ -132,19 +132,31 @@ begin
   if IsFirebird then
     Result := 'SELECT id, category_id, name FROM benchmark_product_rows(' + IntToStr(ARows) + ')'
   else
-    Result := 'WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq ' +
-      'WHERE id < ' + IntToStr(ARows) + ') SELECT id, id % 10 category_id, ' +
-      '''Product '' || id name FROM seq';
+    Result := Format(
+      '''
+        WITH RECURSIVE seq(id) AS (
+          SELECT 1
+          UNION ALL
+          SELECT id + 1 FROM seq WHERE id < %d
+        )
+        SELECT id, id %% 10 AS category_id, 'Product ' || id AS name
+        FROM seq
+        ''',
+      [ARows]);
 end;
 
 function SlowSql: string;
 begin
   if IsFirebird then
-    Result := 'EXECUTE BLOCK AS DECLARE VARIABLE i BIGINT = 0; BEGIN ' +
-      'WHILE (i < 50000000) DO i = i + 1; END'
+    Result := '''
+      EXECUTE BLOCK AS DECLARE VARIABLE i BIGINT = 0; BEGIN
+      WHILE (i < 50000000) DO i = i + 1; END
+      '''
   else
-    Result := 'CREATE TEMP TABLE ch19_cancel AS WITH RECURSIVE seq(id) AS ' +
-      '(SELECT 1 UNION ALL SELECT id + 1 FROM seq WHERE id < 10000000) SELECT id FROM seq';
+    Result := '''
+      CREATE TEMP TABLE ch19_cancel AS WITH RECURSIVE seq(id) AS
+      (SELECT 1 UNION ALL SELECT id + 1 FROM seq WHERE id < 10000000) SELECT id FROM seq
+      ''';
 end;
 
 procedure WaitCommand(AQuery: TFDQuery);
@@ -172,75 +184,77 @@ begin
 end;
 
 procedure RunAsync;
-var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q: TFDQuery;
-  T: TStopwatch; CallUs, TotalUs: Int64; Rows: Integer; Observer: TAsyncObserver;
+var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query: TFDQuery;
+  Timer: TStopwatch; CallUs, TotalUs: Int64; Rows: Integer; Observer: TAsyncObserver;
 begin
   Link := TFDPhysFBDriverLink.Create(nil); Conn := NewDirect(Link);
-  Q := TFDQuery.Create(nil); Observer := TAsyncObserver.Create;
+  Query := TFDQuery.Create(nil); Observer := TAsyncObserver.Create;
   try
-    Q.Connection := Conn; Q.ResourceOptions.CmdExecMode := amAsync;
-    Q.AfterOpen := Observer.HandleAfterOpen;
-    Q.SQL.Text := SyntheticSql(100000); T := TStopwatch.StartNew; Q.Open;
-    CallUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-    WaitEvent(Observer.Completed); Q.ResourceOptions.CmdExecMode := amBlocking; Q.FetchAll;
-    TotalUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-    Check(Q.RecordCount = 100000, 'Async não materializou cem mil linhas.');
-    Rows := Q.RecordCount;
-    Q.Close; Q.ResourceOptions.CmdExecMode := amAsync;
-    Q.OnError := Observer.HandleError; Q.SQL.Text := 'INSERT INTO product ' +
-      '(id, sku, name, category_id, price, active) ' +
-      'VALUES (1, ''DUP'', ''Duplicate'', 1, 1, 1)';
+    Query.Connection := Conn; Query.ResourceOptions.CmdExecMode := amAsync;
+    Query.AfterOpen := Observer.HandleAfterOpen;
+    Query.SQL.Text := SyntheticSql(100000); Timer := TStopwatch.StartNew; Query.Open;
+    CallUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    WaitEvent(Observer.Completed); Query.ResourceOptions.CmdExecMode := amBlocking; Query.FetchAll;
+    TotalUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    Check(Query.RecordCount = 100000, 'Async não materializou cem mil linhas.');
+    Rows := Query.RecordCount;
+    Query.Close; Query.ResourceOptions.CmdExecMode := amAsync;
+    Query.OnError := Observer.HandleError; Query.SQL.Text := '''
+      INSERT INTO product
+      (id, sku, name, category_id, price, active)
+      VALUES (1, 'DUP', 'Duplicate', 1, 1, 1)
+      ''';
     try
-      Q.ExecSQL;
+      Query.ExecSQL;
       Sleep(20);
       CheckSynchronize(1);
-      WaitCommand(Q);
+      WaitCommand(Query);
     except
-      on E: Exception do
+      on CaughtException: Exception do
       begin
         Observer.ErrorSeen := True;
-        Observer.ErrorClass := E.ClassName;
+        Observer.ErrorClass := CaughtException.ClassName;
       end;
     end;
     Check(Observer.ErrorSeen, 'Erro assíncrono não chegou ao handler.');
     Writeln(Format('EX-19-01 call_us=%d total_us=%d rows=%d error=%s',
       [CallUs, TotalUs, Rows, Observer.ErrorClass]));
-  finally Observer.Free; Q.Free; Conn.Free; Link.Free; end;
+  finally Observer.Free; Query.Free; Conn.Free; Link.Free; end;
 end;
 
 procedure RunCancel;
-var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q: TFDQuery;
-  T: TStopwatch; CancelUs: Int64;
+var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query: TFDQuery;
+  Timer: TStopwatch; CancelUs: Int64;
 begin
-  Link := TFDPhysFBDriverLink.Create(nil); Conn := NewDirect(Link); Q := TFDQuery.Create(nil);
+  Link := TFDPhysFBDriverLink.Create(nil); Conn := NewDirect(Link); Query := TFDQuery.Create(nil);
   try
-    Q.Connection := Conn; Q.ResourceOptions.CmdExecMode := amAsync; Q.SQL.Text := SlowSql;
-    Q.ExecSQL; Sleep(20); T := TStopwatch.StartNew; Q.AbortJob(True);
-    CancelUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency; WaitCommand(Q);
+    Query.Connection := Conn; Query.ResourceOptions.CmdExecMode := amAsync; Query.SQL.Text := SlowSql;
+    Query.ExecSQL; Sleep(20); Timer := TStopwatch.StartNew; Query.AbortJob(True);
+    CancelUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency; WaitCommand(Query);
     Check(Conn.ExecSQLScalar('SELECT COUNT(*) FROM product') = 3,
       'Conexão não respondeu após cancelamento.');
-    Q.Disconnect(True);
+    Query.Disconnect(True);
     Writeln(Format('EX-19-02 cancel_us=%d active=%s reusable=True',
-      [CancelUs, BoolToStr(Q.Active, True)]));
-  finally Q.Free; Conn.Free; Link.Free; end;
+      [CancelUs, BoolToStr(Query.Active, True)]));
+  finally Query.Free; Conn.Free; Link.Free; end;
 end;
 
 procedure RunTasks;
 const Count = 12;
-var Tasks: TArray<ITask>; I, Success: Integer;
+var Tasks: TArray<ITask>; TaskIndex, Success: Integer;
 begin
   SetLength(Tasks, Count); Success := 0;
-  for I := 0 to Count - 1 do
-    Tasks[I] := TTask.Run(TProc(
+  for TaskIndex := 0 to Count - 1 do
+    Tasks[TaskIndex] := TTask.Run(TProc(
       procedure
-      var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q: TFDQuery;
+      var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query: TFDQuery;
       begin
-        Link := TFDPhysFBDriverLink.Create(nil); Conn := nil; Q := nil;
+        Link := TFDPhysFBDriverLink.Create(nil); Conn := nil; Query := nil;
         try
-          Conn := NewDirect(Link); Q := TFDQuery.Create(nil); Q.Connection := Conn;
-          Q.SQL.Text := 'SELECT COUNT(*) FROM product'; Q.Open;
-          if Q.Fields[0].AsInteger = 3 then TInterlocked.Increment(Success);
-        finally Q.Free; Conn.Free; Link.Free; end;
+          Conn := NewDirect(Link); Query := TFDQuery.Create(nil); Query.Connection := Conn;
+          Query.SQL.Text := 'SELECT COUNT(*) FROM product'; Query.Open;
+          if Query.Fields[0].AsInteger = 3 then TInterlocked.Increment(Success);
+        finally Query.Free; Conn.Free; Link.Free; end;
       end));
   TTask.WaitForAll(Tasks);
   Check(Success = Count, 'Nem todas as tasks concluíram com conexão própria.');
@@ -248,13 +262,13 @@ begin
 end;
 
 procedure AddDefinition(const AName: string; APooled: Boolean; AMaximum: Integer);
-var P: TStringList;
+var ConnectionParams: TStringList;
 begin
-  P := TStringList.Create;
+  ConnectionParams := TStringList.Create;
   try
-    FillParams(P, APooled, AMaximum);
-    FDManager.AddConnectionDef(AName, IfThen(IsFirebird, 'FB', 'SQLite'), P);
-  finally P.Free; end;
+    FillParams(ConnectionParams, APooled, AMaximum);
+    FDManager.AddConnectionDef(AName, IfThen(IsFirebird, 'FB', 'SQLite'), ConnectionParams);
+  finally ConnectionParams.Free; end;
 end;
 
 function OpenByDef(const AName: string): TFDConnection;
@@ -265,18 +279,18 @@ end;
 
 procedure RunPool;
 const Count = 4;
-var Name: string; Tasks: TArray<ITask>; I, Success: Integer;
+var Name: string; Tasks: TArray<ITask>; TaskIndex, Success: Integer;
 begin
   Name := 'CH19_POOL_' + IntToStr(GetCurrentProcessId); AddDefinition(Name, True, Count);
   SetLength(Tasks, Count); Success := 0;
   try
-    for I := 0 to Count - 1 do Tasks[I] := TTask.Run(TProc(
+    for TaskIndex := 0 to Count - 1 do Tasks[TaskIndex] := TTask.Run(TProc(
       procedure
-      var C: TFDConnection;
+      var LeasedConnection: TFDConnection;
       begin
-        C := OpenByDef(Name);
-        try Sleep(30); if C.ExecSQLScalar('SELECT COUNT(*) FROM product') = 3 then
-          TInterlocked.Increment(Success); finally C.Free; end;
+        LeasedConnection := OpenByDef(Name);
+        try Sleep(30); if LeasedConnection.ExecSQLScalar('SELECT COUNT(*) FROM product') = 3 then
+          TInterlocked.Increment(Success); finally LeasedConnection.Free; end;
       end));
     TTask.WaitForAll(Tasks);
     Check(Success = Count, 'Pool não serviu todas as tasks.');
@@ -291,7 +305,7 @@ begin
   C1 := nil; C2 := nil; C3 := nil; Recovered := nil; Rejected := False;
   try
     C1 := OpenByDef(Name); C2 := OpenByDef(Name);
-    try C3 := OpenByDef(Name); except on E: EFDException do Rejected := True; end;
+    try C3 := OpenByDef(Name); except on CaughtException: EFDException do Rejected := True; end;
     Check(Rejected, 'Terceiro lease não foi rejeitado com pool máximo 2.');
     C1.Free; C1 := nil;
     Recovered := OpenByDef(Name);
@@ -305,44 +319,44 @@ begin
 end;
 
 procedure RunBench;
-var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Q: TFDQuery;
-  T: TStopwatch; BlockingUs, AsyncCallUs, AsyncTotalUs: Int64; Observer: TAsyncObserver;
+var Link: TFDPhysFBDriverLink; Conn: TFDConnection; Query: TFDQuery;
+  Timer: TStopwatch; BlockingUs, AsyncCallUs, AsyncTotalUs: Int64; Observer: TAsyncObserver;
 begin
-  Link := TFDPhysFBDriverLink.Create(nil); Conn := NewDirect(Link); Q := TFDQuery.Create(nil);
+  Link := TFDPhysFBDriverLink.Create(nil); Conn := NewDirect(Link); Query := TFDQuery.Create(nil);
   Observer := TAsyncObserver.Create;
   try
-    Q.Connection := Conn; Q.FetchOptions.Mode := fmAll; Q.SQL.Text := SyntheticSql(100000);
-    T := TStopwatch.StartNew; Q.Open; Q.FetchAll;
-    BlockingUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-    Check(Q.RecordCount = 100000, 'Blocking divergiu.'); Q.Close;
-    Q.ResourceOptions.CmdExecMode := amAsync; Q.AfterOpen := Observer.HandleAfterOpen;
-    T := TStopwatch.StartNew; Q.Open;
-    AsyncCallUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-    WaitEvent(Observer.Completed); Q.ResourceOptions.CmdExecMode := amBlocking; Q.FetchAll;
-    AsyncTotalUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
-    Check(Q.RecordCount = 100000, 'Async divergiu.');
+    Query.Connection := Conn; Query.FetchOptions.Mode := fmAll; Query.SQL.Text := SyntheticSql(100000);
+    Timer := TStopwatch.StartNew; Query.Open; Query.FetchAll;
+    BlockingUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    Check(Query.RecordCount = 100000, 'Blocking divergiu.'); Query.Close;
+    Query.ResourceOptions.CmdExecMode := amAsync; Query.AfterOpen := Observer.HandleAfterOpen;
+    Timer := TStopwatch.StartNew; Query.Open;
+    AsyncCallUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    WaitEvent(Observer.Completed); Query.ResourceOptions.CmdExecMode := amBlocking; Query.FetchAll;
+    AsyncTotalUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    Check(Query.RecordCount = 100000, 'Async divergiu.');
     Writeln(Format('BM-09 blocking_us=%d async_call_us=%d async_total_us=%d rows=100000',
       [BlockingUs, AsyncCallUs, AsyncTotalUs]));
-  finally Observer.Free; Q.Free; Conn.Free; Link.Free; end;
+  finally Observer.Free; Query.Free; Conn.Free; Link.Free; end;
 end;
 
 procedure RunPoolBench;
 const Leases = 10;
-var NewName, PoolName: string; C: TFDConnection; I: Integer;
-  T: TStopwatch; NewUs, PoolUs: Int64;
+var NewName, PoolName: string; LeasedConnection: TFDConnection; TaskIndex: Integer;
+  Timer: TStopwatch; NewUs, PoolUs: Int64;
 begin
   NewName := 'CH19_NEW_' + IntToStr(GetCurrentProcessId);
   PoolName := 'CH19_BENCH_POOL_' + IntToStr(GetCurrentProcessId);
   AddDefinition(NewName, False, 0); AddDefinition(PoolName, True, 4);
   try
-    T := TStopwatch.StartNew;
-    for I := 1 to Leases do begin C := OpenByDef(NewName); C.Free; end;
-    NewUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    Timer := TStopwatch.StartNew;
+    for TaskIndex := 1 to Leases do begin LeasedConnection := OpenByDef(NewName); LeasedConnection.Free; end;
+    NewUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
     { Warm the pool before measuring leases that can reuse a physical connection. }
-    C := OpenByDef(PoolName); C.Free;
-    T := TStopwatch.StartNew;
-    for I := 1 to Leases do begin C := OpenByDef(PoolName); C.Free; end;
-    PoolUs := T.ElapsedTicks * 1000000 div TStopwatch.Frequency;
+    LeasedConnection := OpenByDef(PoolName); LeasedConnection.Free;
+    Timer := TStopwatch.StartNew;
+    for TaskIndex := 1 to Leases do begin LeasedConnection := OpenByDef(PoolName); LeasedConnection.Free; end;
+    PoolUs := Timer.ElapsedTicks * 1000000 div TStopwatch.Frequency;
     Writeln(Format('BM-08 leases=%d new_us=%d pooled_us=%d', [Leases, NewUs, PoolUs]));
   finally
     FDManager.CloseConnectionDef(PoolName); FDManager.DeleteConnectionDef(PoolName);
@@ -366,7 +380,7 @@ begin
     else if SameText(ParamStr(1), 'poolbench') then RunPoolBench
     else raise Exception.Create('Modo inválido.');
   except
-    on E: Exception do begin Writeln(ErrOutput, E.ClassName, ': ', E.Message); ExitCode := 1; end;
+    on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end;
   end;
   DriverLink.Free;
 end.

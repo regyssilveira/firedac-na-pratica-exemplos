@@ -55,9 +55,11 @@ end;
 procedure CreateSQLiteCatalog(AConnection: TFDConnection);
 begin
   AConnection.ExecSQL(
-    'CREATE TABLE product (' +
-    'id INTEGER PRIMARY KEY, sku VARCHAR(30) NOT NULL UNIQUE, ' +
-    'name VARCHAR(120) NOT NULL, price NUMERIC(15, 2) NOT NULL)');
+    '''
+      CREATE TABLE product (
+      id INTEGER PRIMARY KEY, sku VARCHAR(30) NOT NULL UNIQUE,
+      name VARCHAR(120) NOT NULL, price NUMERIC(15, 2) NOT NULL)
+      ''');
   AConnection.ExecSQL(
     'INSERT INTO product (id, sku, name, price) VALUES (:id, :sku, :name, :price)',
     [1, 'BEB-001', 'Caf' + #$00E9 + ' especial', 29.90]);
@@ -175,10 +177,10 @@ begin
       Connection.Open;
       raise Exception.Create('O teste deveria falhar com a biblioteca ausente.');
     except
-      on E: EFDException do
+      on CaughtException: EFDException do
       begin
-        if Pos('fbclient.dll', LowerCase(E.Message)) = 0 then
-          raise Exception.CreateFmt('Falha sem contexto da biblioteca: %s', [E.Message]);
+        if Pos('fbclient.dll', LowerCase(CaughtException.Message)) = 0 then
+          raise Exception.CreateFmt('Falha sem contexto da biblioteca: %s', [CaughtException.Message]);
         Writeln('EX-01-05 aprovado: cliente ausente produziu diagnóstico preservado.');
       end;
     end;

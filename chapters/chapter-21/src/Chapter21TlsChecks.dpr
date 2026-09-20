@@ -55,10 +55,10 @@ begin
       Result := True;
       AError := '';
     except
-      on E: EFDDBEngineException do
+      on CaughtException: EFDDBEngineException do
       begin
         Result := False;
-        AError := E.Message;
+        AError := CaughtException.Message;
       end;
     end;
   finally
@@ -92,8 +92,10 @@ begin
       ';connect_timeout=3;application_name=FireDACNaPraticaTLS';
     Connection.Open;
     Check(Connection.ExecSQLScalar(
-      'select case when ssl then 1 else 0 end from pg_stat_ssl ' +
-      'where pid=pg_backend_pid()') = 1,
+      '''
+        select case when ssl then 1 else 0 end from pg_stat_ssl
+        where pid=pg_backend_pid()
+        ''') = 1,
       'O servidor não confirmou TLS para a sessão.');
     Check(VarToStr(Connection.ExecSQLScalar(
       'select current_setting(''application_name'')')) = 'FireDACNaPraticaTLS',
@@ -114,9 +116,9 @@ begin
   try
     RunTls;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

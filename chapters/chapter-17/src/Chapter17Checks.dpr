@@ -246,8 +246,10 @@ begin
     LocalSQL.DataSets.Add(Inventory, '', 'fb_inventory');
     LocalSQL.Active := True;
     ResultQuery.Connection := LocalConnection;
-    ResultQuery.SQL.Text := 'SELECT p.sku, i.quantity FROM source_products p ' +
-      'JOIN fb_inventory i ON i.product_id = p.product_id ORDER BY p.product_id';
+    ResultQuery.SQL.Text := '''
+      SELECT p.sku, i.quantity FROM source_products p
+      JOIN fb_inventory i ON i.product_id = p.product_id ORDER BY p.product_id
+      ''';
     ResultQuery.Open;
     Check(ResultQuery.RecordCount = 3, 'Composição de duas conexões perdeu linhas.');
     Check((Products.RecordCount = 3) and (Inventory.RecordCount = 3),
@@ -326,8 +328,10 @@ begin
     LocalSQL.DataSets.Add(Products, '', 'products');
     LocalSQL.Active := True;
     Query.Connection := Connection;
-    Query.SQL.Text := 'SELECT sqlite_version() AS version, typeof(price) AS storage_type ' +
-      'FROM products LIMIT 1';
+    Query.SQL.Text := '''
+      SELECT sqlite_version() AS version, typeof(price) AS storage_type
+      FROM products LIMIT 1
+      ''';
     Query.Open;
     Version := Query.FieldByName('version').AsString;
     Check(Version <> '', 'Versão SQLite local não foi obtida.');
@@ -337,7 +341,7 @@ begin
       Query.SQL.Text := 'SELECT GEN_UUID() FROM products LIMIT 1';
       Query.Open;
     except
-      on E: Exception do FunctionRejected := True;
+      on CaughtException: Exception do FunctionRejected := True;
     end;
     if Query.Active then Query.Close;
     SyntaxRejected := False;
@@ -345,7 +349,7 @@ begin
       Query.SQL.Text := 'SELECT FIRST 1 sku FROM products';
       Query.Open;
     except
-      on E: Exception do SyntaxRejected := True;
+      on CaughtException: Exception do SyntaxRejected := True;
     end;
     Check(FunctionRejected, 'Função específica do Firebird foi aceita inesperadamente.');
     Check(SyntaxRejected, 'Sintaxe FIRST do Firebird foi aceita inesperadamente.');
@@ -374,6 +378,6 @@ begin
     else if SameText(ParamStr(1), 'limits') then RunLimits
     else begin ShowUsage; ExitCode := 2; end;
   except
-    on E: Exception do begin Writeln(ErrOutput, E.ClassName, ': ', E.Message); ExitCode := 1; end;
+    on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end;
   end;
 end.

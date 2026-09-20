@@ -319,9 +319,11 @@ begin
   else
   begin
     Result :=
-      'WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq ' +
-      'WHERE id < :row_count) SELECT id, id % 10 AS category_id, ' +
-      '''Product '' || id AS name FROM seq';
+      '''
+        WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq
+        WHERE id < :row_count) SELECT id, id % 10 AS category_id,
+        'Product ' || id AS name FROM seq
+        ''';
     if ARemoteFilter then
       Result := Result + ' WHERE id % 10 = :category_id';
   end;
@@ -413,9 +415,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

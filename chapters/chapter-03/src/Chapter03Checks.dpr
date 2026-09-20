@@ -274,7 +274,7 @@ begin
   try
     ParseEnvironment('produção-talvez');
   except
-    on E: EArgumentException do
+    on CaughtException: EArgumentException do
       FailedAsExpected := True;
   end;
   Check(FailedAsExpected, 'Ambiente desconhecido não foi rejeitado.');
@@ -311,9 +311,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

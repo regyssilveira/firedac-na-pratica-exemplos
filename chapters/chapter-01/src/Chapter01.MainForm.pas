@@ -110,8 +110,8 @@ begin
     QryProducts.Open;
     LblStatus.Caption := Format('%d produto(s).', [QryProducts.RecordCount]);
   except
-    on E: EFDDBEngineException do
-      raise Exception.CreateFmt('Não foi possível abrir o catálogo. %s', [E.Message]);
+    on CaughtException: EFDDBEngineException do
+      raise Exception.CreateFmt('Não foi possível abrir o catálogo. %s', [CaughtException.Message]);
   end;
 end;
 
@@ -132,11 +132,11 @@ begin
     if ResultFile <> '' then
       TFile.WriteAllText(ResultFile, 'OK', TEncoding.UTF8);
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
       ExitCode := 1;
       if ResultFile <> '' then
-        TFile.WriteAllText(ResultFile, E.ClassName + ': ' + E.Message,
+        TFile.WriteAllText(ResultFile, CaughtException.ClassName + ': ' + CaughtException.Message,
           TEncoding.UTF8);
     end;
   end;

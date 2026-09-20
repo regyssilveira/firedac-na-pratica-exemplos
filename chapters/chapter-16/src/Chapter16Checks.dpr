@@ -87,13 +87,19 @@ end;
 procedure PrepareOrders(AConnection: TFDConnection);
 begin
   DeleteOrders(AConnection, 160001, 160002);
-  AConnection.ExecSQL('INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-    'VALUES (160001, ''EX-16-A'', ''PENDING'', 25)');
-  AConnection.ExecSQL('INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-    'VALUES (160002, ''EX-16-B'', ''PENDING'', 30)');
-  AConnection.ExecSQL('INSERT INTO sales_order_item ' +
-    '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-    'VALUES (160101, 160001, 1, 1, 1, 10)');
+  AConnection.ExecSQL('''
+    INSERT INTO sales_order (id, idempotency_key, order_status, total)
+    VALUES (160001, 'EX-16-A', 'PENDING', 25)
+    ''');
+  AConnection.ExecSQL('''
+    INSERT INTO sales_order (id, idempotency_key, order_status, total)
+    VALUES (160002, 'EX-16-B', 'PENDING', 30)
+    ''');
+  AConnection.ExecSQL('''
+    INSERT INTO sales_order_item
+    (id, order_id, line_no, product_id, quantity, unit_price)
+    VALUES (160101, 160001, 1, 1, 1, 10)
+    ''');
 end;
 
 procedure RunJournal;
@@ -110,8 +116,10 @@ begin
     Query.Connection := Connection;
     Query.CachedUpdates := True;
     Query.UpdateOptions.KeyFields := 'id';
-    Query.SQL.Text := 'SELECT id, sku, name, category_id, price, active, version ' +
-      'FROM product WHERE id IN (1, 2, 3) ORDER BY id';
+    Query.SQL.Text := '''
+      SELECT id, sku, name, category_id, price, active, version
+      FROM product WHERE id IN (1, 2, 3) ORDER BY id
+      ''';
     Query.Open;
     Query.First;
     Query.Edit;
@@ -201,11 +209,15 @@ begin
     Query.CachedUpdates := True;
     Query.UpdateOptions.KeyFields := 'id';
     Query.UpdateOptions.CountUpdatedRecords := True;
-    Query.SQL.Text := 'SELECT id, idempotency_key, order_status, total ' +
-      'FROM sales_order WHERE id = 160001';
+    Query.SQL.Text := '''
+      SELECT id, idempotency_key, order_status, total
+      FROM sales_order WHERE id = 160001
+      ''';
     UpdateSQL.Connection := Main;
-    UpdateSQL.ModifySQL.Text := 'UPDATE sales_order SET total = :NEW_total ' +
-      'WHERE id = :OLD_id AND total = :OLD_total';
+    UpdateSQL.ModifySQL.Text := '''
+      UPDATE sales_order SET total = :NEW_total
+      WHERE id = :OLD_id AND total = :OLD_total
+      ''';
     Query.UpdateObject := UpdateSQL;
     Query.Open;
     Query.Edit;
@@ -255,8 +267,10 @@ begin
     Query.Connection := Connection;
     Query.CachedUpdates := True;
     Query.UpdateOptions.KeyFields := 'id';
-    Query.SQL.Text := 'SELECT id, idempotency_key, order_status, total ' +
-      'FROM sales_order WHERE id BETWEEN 160001 AND 160002 ORDER BY id';
+    Query.SQL.Text := '''
+      SELECT id, idempotency_key, order_status, total
+      FROM sales_order WHERE id BETWEEN 160001 AND 160002 ORDER BY id
+      ''';
     Query.Open;
     Query.First;
     Query.Edit;
@@ -271,8 +285,10 @@ begin
     Check(Errors = 0, 'Primeiro apply retornou erros.');
     Connection.Rollback;
     Check(Query.UpdatesPending, 'Rollback eliminou o journal local.');
-    Check(Connection.ExecSQLScalar('SELECT SUM(total) FROM sales_order ' +
-      'WHERE id BETWEEN 160001 AND 160002') = 55, 'Rollback não restaurou o banco.');
+    Check(Connection.ExecSQLScalar('''
+      SELECT SUM(total) FROM sales_order
+      WHERE id BETWEEN 160001 AND 160002
+      ''') = 55, 'Rollback não restaurou o banco.');
     Connection.StartTransaction;
     try
       Errors := Query.ApplyUpdates(0);
@@ -283,8 +299,10 @@ begin
       if Connection.InTransaction then Connection.Rollback;
       raise;
     end;
-    Check(Connection.ExecSQLScalar('SELECT SUM(total) FROM sales_order ' +
-      'WHERE id BETWEEN 160001 AND 160002') = 57, 'Commit não persistiu as duas edições.');
+    Check(Connection.ExecSQLScalar('''
+      SELECT SUM(total) FROM sales_order
+      WHERE id BETWEEN 160001 AND 160002
+      ''') = 57, 'Commit não persistiu as duas edições.');
     Check(not Query.UpdatesPending, 'CommitUpdates não encerrou o journal.');
     Writeln('EX-16-04 aprovado: rollback preservou journal; retry/commit o encerrou.');
   finally
@@ -317,14 +335,18 @@ begin
     Master.SchemaAdapter := Adapter;
     Master.CachedUpdates := True;
     Master.UpdateOptions.KeyFields := 'id';
-    Master.SQL.Text := 'SELECT id, idempotency_key, order_status, total ' +
-      'FROM sales_order WHERE id = 160001';
+    Master.SQL.Text := '''
+      SELECT id, idempotency_key, order_status, total
+      FROM sales_order WHERE id = 160001
+      ''';
     Detail.Connection := Connection;
     Detail.SchemaAdapter := Adapter;
     Detail.CachedUpdates := True;
     Detail.UpdateOptions.KeyFields := 'id';
-    Detail.SQL.Text := 'SELECT id, order_id, line_no, product_id, quantity, unit_price ' +
-      'FROM sales_order_item WHERE order_id = 160001 ORDER BY line_no';
+    Detail.SQL.Text := '''
+      SELECT id, order_id, line_no, product_id, quantity, unit_price
+      FROM sales_order_item WHERE order_id = 160001 ORDER BY line_no
+      ''';
     Detail.IndexFieldNames := 'order_id';
     Source.DataSet := Master;
     Detail.MasterSource := Source;
@@ -381,6 +403,6 @@ begin
     else if SameText(ParamStr(1), 'centralized') then RunCentralized
     else begin ShowUsage; ExitCode := 2; end;
   except
-    on E: Exception do begin Writeln(ErrOutput, E.ClassName, ': ', E.Message); ExitCode := 1; end;
+    on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end;
   end;
 end.

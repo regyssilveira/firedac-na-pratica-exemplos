@@ -214,7 +214,7 @@ begin
       try
         ParseOrder('price; delete from product');
       except
-        on E: EArgumentException do
+        on CaughtException: EArgumentException do
           Rejected := True;
       end;
       Check(Rejected, 'Estrutura hostil não foi rejeitada antes da macro.');
@@ -301,12 +301,12 @@ begin
       Input, Output: TMemoryStream;
       Query: TFDQuery;
       Original, Returned: TBytes;
-      I: Integer;
+      Index: Integer;
       HashBefore, HashAfter: string;
     begin
       SetLength(Original, 8192);
-      for I := 0 to High(Original) do
-        Original[I] := Byte((I * 31 + 17) mod 256);
+      for Index := 0 to High(Original) do
+        Original[Index] := Byte((Index * 31 + 17) mod 256);
       Input := TMemoryStream.Create;
       Output := TMemoryStream.Create;
       Query := TFDQuery.Create(nil);
@@ -438,9 +438,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

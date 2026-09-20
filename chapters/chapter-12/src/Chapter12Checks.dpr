@@ -113,17 +113,23 @@ begin
   AConnection.StartTransaction;
   try
     AConnection.ExecSQL(
-      'INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-      'VALUES (:id, :key, ''PENDING'', 0)',
+      '''
+        INSERT INTO sales_order (id, idempotency_key, order_status, total)
+        VALUES (:id, :key, 'PENDING', 0)
+        ''',
       [AOrderId, 'EX-12-' + IntToStr(AOrderId)]);
     AConnection.ExecSQL(
-      'INSERT INTO sales_order_item ' +
-      '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-      'VALUES (121101, :id, 1, 1, 2, 10)', [AOrderId]);
+      '''
+        INSERT INTO sales_order_item
+        (id, order_id, line_no, product_id, quantity, unit_price)
+        VALUES (121101, :id, 1, 1, 2, 10)
+        ''', [AOrderId]);
     AConnection.ExecSQL(
-      'INSERT INTO sales_order_item ' +
-      '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-      'VALUES (121102, :id, 2, 2, 1, 15)', [AOrderId]);
+      '''
+        INSERT INTO sales_order_item
+        (id, order_id, line_no, product_id, quantity, unit_price)
+        VALUES (121102, :id, 2, 2, 1, 15)
+        ''', [AOrderId]);
     AConnection.Commit;
   except
     if AConnection.InTransaction then AConnection.Rollback;
@@ -210,8 +216,10 @@ begin
       Query.SQL.Text := 'SELECT * FROM order_lines(:id) ORDER BY p_line_no'
     else
       Query.SQL.Text :=
-        'SELECT line_no, product_id, quantity, unit_price ' +
-        'FROM sales_order_item WHERE order_id = :id ORDER BY line_no';
+        '''
+          SELECT line_no, product_id, quantity, unit_price
+          FROM sales_order_item WHERE order_id = :id ORDER BY line_no
+          ''';
     Query.ParamByName('id').AsLargeInt := 121001;
     Query.Open;
     LineCount := 0;
@@ -277,9 +285,11 @@ begin
       'UPDATE sales_order SET order_status = ''CLOSED'', total = :total WHERE id = :id',
       [ATotal, AOrderId]);
     AConnection.ExecSQL(
-      'INSERT INTO outbox_event ' +
-      '(aggregate_type, aggregate_id, event_type, payload) ' +
-      'VALUES (''SALES_ORDER'', :id, ''ORDER_CLOSED'', :payload)',
+      '''
+        INSERT INTO outbox_event
+        (aggregate_type, aggregate_id, event_type, payload)
+        VALUES ('SALES_ORDER', :id, 'ORDER_CLOSED', :payload)
+        ''',
       [AOrderId, AOperationKey]);
     AStatus := 'CLOSED';
   end;
@@ -343,8 +353,10 @@ begin
       raise;
     end;
     Check(Connection.ExecSQLScalar(
-      'SELECT COUNT(*) FROM outbox_event ' +
-      'WHERE aggregate_id = 121001 AND event_type = ''ORDER_CLOSED''') = 1,
+      '''
+        SELECT COUNT(*) FROM outbox_event
+        WHERE aggregate_id = 121001 AND event_type = 'ORDER_CLOSED'
+        ''') = 1,
       'Primeiro fechamento não gravou exatamente um evento outbox.');
 
     Connection.StartTransaction;
@@ -357,8 +369,10 @@ begin
       raise;
     end;
     Check(Connection.ExecSQLScalar(
-      'SELECT COUNT(*) FROM outbox_event ' +
-      'WHERE aggregate_id = 121001 AND event_type = ''ORDER_CLOSED''') = 1,
+      '''
+        SELECT COUNT(*) FROM outbox_event
+        WHERE aggregate_id = 121001 AND event_type = 'ORDER_CLOSED'
+        ''') = 1,
       'Repetição idempotente duplicou o evento outbox.');
     Check(Connection.ExecSQLScalar(
       'SELECT total FROM sales_order WHERE id = 121001') = 35,
@@ -488,9 +502,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

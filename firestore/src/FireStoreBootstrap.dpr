@@ -96,11 +96,13 @@ begin
     Exit;
 
   AConnection.ExecSQL(
-    'CREATE TABLE schema_version (' +
-    'version INTEGER NOT NULL PRIMARY KEY, ' +
-    'description VARCHAR(120) NOT NULL, ' +
-    'checksum CHAR(64) NOT NULL, ' +
-    'applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)');
+    '''
+      CREATE TABLE schema_version (
+      version INTEGER NOT NULL PRIMARY KEY,
+      description VARCHAR(120) NOT NULL,
+      checksum CHAR(64) NOT NULL,
+      applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)
+      ''');
 end;
 
 procedure ExecuteScript(AConnection: TFDConnection; const AFileName: string);
@@ -163,8 +165,10 @@ begin
     try
       ExecuteScript(AConnection, FileName);
       AConnection.ExecSQL(
-        'INSERT INTO schema_version (version, description, checksum) ' +
-        'VALUES (:version, :description, :checksum)',
+        '''
+          INSERT INTO schema_version (version, description, checksum)
+          VALUES (:version, :description, :checksum)
+          ''',
         [Version, Description, Checksum]);
       AConnection.Commit;
       Writeln(Format('V%.3d aplicada: %s', [Version, Description]));
@@ -218,9 +222,9 @@ begin
       else
         raise Exception.CreateFmt('Comando inválido: %s', [Command]);
     except
-      on E: Exception do
+      on CaughtException: Exception do
       begin
-        Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+        Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
         ExitCode := 1;
       end;
     end;

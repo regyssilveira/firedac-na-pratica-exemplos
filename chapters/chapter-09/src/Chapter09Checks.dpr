@@ -135,9 +135,11 @@ begin
     Result := 'SELECT id, category_id, name FROM benchmark_product_rows(:row_count)'
   else
     Result :=
-      'WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq ' +
-      'WHERE id < :row_count) SELECT id, id % 10 AS category_id, ' +
-      '''Product '' || id AS name FROM seq';
+      '''
+        WITH RECURSIVE seq(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM seq
+        WHERE id < :row_count) SELECT id, id % 10 AS category_id,
+        'Product ' || id AS name FROM seq
+        ''';
 end;
 
 procedure ConfigureSynthetic(AQuery: TFDQuery; AMode: TFDFetchMode;
@@ -248,11 +250,11 @@ begin
       Update, Query: TFDQuery;
       Data: TBytes;
       Input: TMemoryStream;
-      I, BlobSize: Integer;
+      Index, BlobSize: Integer;
     begin
       SetLength(Data, 8192);
-      for I := 0 to High(Data) do
-        Data[I] := Byte((I * 17 + 3) mod 256);
+      for Index := 0 to High(Data) do
+        Data[Index] := Byte((Index * 17 + 3) mod 256);
       Input := TMemoryStream.Create;
       Update := TFDQuery.Create(nil);
       Query := TFDQuery.Create(nil);
@@ -302,7 +304,7 @@ var
   Timer: TStopwatch;
   MemoryBefore, MemoryAfter: UInt64;
   OpenUs, TotalUs, BytesRead: Int64;
-  I, N, Rows: Integer;
+  Index, ChunkBytesRead, Rows: Integer;
   Buffer: array[0..8191] of Byte;
 begin
   Check(SameText(AMode, 'immediate') or SameText(AMode, 'deferred') or
@@ -318,24 +320,26 @@ begin
     Connection.StartTransaction;
     try
       SetLength(Data, CBlobSize);
-      for I := 0 to High(Data) do
-        Data[I] := Byte((I * 29 + 11) mod 256);
+      for Index := 0 to High(Data) do
+        Data[Index] := Byte((Index * 29 + 11) mod 256);
       Input.WriteBuffer(Data[0], Length(Data));
       Insert.Connection := Connection;
       Insert.SQL.Text :=
-        'INSERT INTO product (id, sku, name, category_id, price, active, image_data) ' +
-        'VALUES (:id, :sku, :name, :category_id, :price, :active, :image)';
+        '''
+          INSERT INTO product (id, sku, name, category_id, price, active, image_data)
+          VALUES (:id, :sku, :name, :category_id, :price, :active, :image)
+          ''';
       Insert.Params.ArraySize := CRowCount;
-      for I := 0 to CRowCount - 1 do
+      for Index := 0 to CRowCount - 1 do
       begin
-        Insert.ParamByName('id').AsLargeInts[I] := 9000000 + I;
-        Insert.ParamByName('sku').AsStrings[I] := Format('BM05-%.3d', [I]);
-        Insert.ParamByName('name').AsStrings[I] := Format('BLOB %.3d', [I]);
-        Insert.ParamByName('category_id').AsLargeInts[I] := 1;
-        Insert.ParamByName('price').AsCurrencys[I] := 1;
-        Insert.ParamByName('active').AsBooleans[I] := True;
+        Insert.ParamByName('id').AsLargeInts[Index] := 9000000 + Index;
+        Insert.ParamByName('sku').AsStrings[Index] := Format('BM05-%.3d', [Index]);
+        Insert.ParamByName('name').AsStrings[Index] := Format('BLOB %.3d', [Index]);
+        Insert.ParamByName('category_id').AsLargeInts[Index] := 1;
+        Insert.ParamByName('price').AsCurrencys[Index] := 1;
+        Insert.ParamByName('active').AsBooleans[Index] := True;
         Input.Position := 0;
-        Insert.ParamByName('image').LoadFromStream(Input, ftBlob, I);
+        Insert.ParamByName('image').LoadFromStream(Input, ftBlob, Index);
       end;
       Insert.Execute(CRowCount, 0);
 
@@ -347,8 +351,10 @@ begin
         Query.FetchOptions.Items := Query.FetchOptions.Items + [fiBlobs]
       else
         Query.FetchOptions.Items := Query.FetchOptions.Items - [fiBlobs];
-      Query.SQL.Text := 'SELECT id, image_data FROM product ' +
-        'WHERE id BETWEEN 9000000 AND 9000099 ORDER BY id';
+      Query.SQL.Text := '''
+        SELECT id, image_data FROM product
+        WHERE id BETWEEN 9000000 AND 9000099 ORDER BY id
+        ''';
 
       BytesRead := 0;
       MemoryBefore := CurrentWorkingSet;
@@ -365,9 +371,9 @@ begin
           BlobStream := Query.CreateBlobStream(Query.FieldByName('image_data'), bmRead);
           try
             repeat
-              N := BlobStream.Read(Buffer, SizeOf(Buffer));
-              Inc(BytesRead, N);
-            until N = 0;
+              ChunkBytesRead := BlobStream.Read(Buffer, SizeOf(Buffer));
+              Inc(BytesRead, ChunkBytesRead);
+            until ChunkBytesRead = 0;
           finally
             BlobStream.Free;
           end;
@@ -381,8 +387,8 @@ begin
       Check(Rows = CRowCount, 'BM-05 não recebeu cem linhas.');
       Check(BytesRead = Int64(CRowCount) * CBlobSize,
         'BM-05 não materializou todos os bytes esperados.');
-      Writeln(Format('BM-05 mode=%s rows=%d blob_size=%d open_us=%d total_us=%d ' +
-        'bytes=%d memory_delta=%d', [AMode, Rows, CBlobSize, OpenUs, TotalUs,
+      Writeln(Format('BM-05 mode=%s rows=%d blob_size=%d open_us=%d total_us=%d bytes=%d memory_delta=%d',
+        [AMode, Rows, CBlobSize, OpenUs, TotalUs,
         BytesRead, Int64(MemoryAfter) - Int64(MemoryBefore)]));
     finally
       if Connection.InTransaction then
@@ -401,13 +407,17 @@ function SlowCommandSql: string;
 begin
   if IsFirebird then
     Result :=
-      'EXECUTE BLOCK AS DECLARE VARIABLE i BIGINT = 0; BEGIN ' +
-      'WHILE (i < 50000000) DO i = i + 1; END'
+      '''
+        EXECUTE BLOCK AS DECLARE VARIABLE i BIGINT = 0; BEGIN
+        WHILE (i < 50000000) DO i = i + 1; END
+        '''
   else
     Result :=
-      'CREATE TEMP TABLE ch09_cancel AS WITH RECURSIVE seq(id) AS ' +
-      '(SELECT 1 UNION ALL SELECT id + 1 FROM seq WHERE id < 10000000) ' +
-      'SELECT id FROM seq';
+      '''
+        CREATE TEMP TABLE ch09_cancel AS WITH RECURSIVE seq(id) AS
+        (SELECT 1 UNION ALL SELECT id + 1 FROM seq WHERE id < 10000000)
+        SELECT id FROM seq
+        ''';
 end;
 
 procedure RunCancellation;
@@ -514,8 +524,7 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter09Checks ondemand|all|blob|cancel|feedback|' +
-    'benchmark-blob-immediate|benchmark-blob-deferred|benchmark-blob-stream');
+  Writeln('Uso: Chapter09Checks ondemand|all|blob|cancel|feedback|benchmark-blob-immediate|benchmark-blob-deferred|benchmark-blob-stream');
 end;
 
 begin
@@ -550,9 +559,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

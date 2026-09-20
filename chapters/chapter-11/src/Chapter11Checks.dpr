@@ -114,23 +114,33 @@ begin
   AConnection.StartTransaction;
   try
     AConnection.ExecSQL(
-      'INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-      'VALUES (111001, ''EX-11-A'', ''PENDING'', 25)');
+      '''
+        INSERT INTO sales_order (id, idempotency_key, order_status, total)
+        VALUES (111001, 'EX-11-A', 'PENDING', 25)
+        ''');
     AConnection.ExecSQL(
-      'INSERT INTO sales_order (id, idempotency_key, order_status, total) ' +
-      'VALUES (111002, ''EX-11-B'', ''PENDING'', 30)');
+      '''
+        INSERT INTO sales_order (id, idempotency_key, order_status, total)
+        VALUES (111002, 'EX-11-B', 'PENDING', 30)
+        ''');
     AConnection.ExecSQL(
-      'INSERT INTO sales_order_item ' +
-      '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-      'VALUES (111101, 111001, 1, 1, 1, 10)');
+      '''
+        INSERT INTO sales_order_item
+        (id, order_id, line_no, product_id, quantity, unit_price)
+        VALUES (111101, 111001, 1, 1, 1, 10)
+        ''');
     AConnection.ExecSQL(
-      'INSERT INTO sales_order_item ' +
-      '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-      'VALUES (111102, 111001, 2, 2, 1, 15)');
+      '''
+        INSERT INTO sales_order_item
+        (id, order_id, line_no, product_id, quantity, unit_price)
+        VALUES (111102, 111001, 2, 2, 1, 15)
+        ''');
     AConnection.ExecSQL(
-      'INSERT INTO sales_order_item ' +
-      '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-      'VALUES (111103, 111002, 1, 3, 1, 30)');
+      '''
+        INSERT INTO sales_order_item
+        (id, order_id, line_no, product_id, quantity, unit_price)
+        VALUES (111103, 111002, 1, 3, 1, 30)
+        ''');
     AConnection.Commit;
   except
     if AConnection.InTransaction then AConnection.Rollback;
@@ -154,13 +164,17 @@ begin
     PrepareTwoOrders(Connection);
     Master.Connection := Connection;
     Master.SQL.Text :=
-      'SELECT id, idempotency_key FROM sales_order ' +
-      'WHERE id BETWEEN 111001 AND 111002 ORDER BY id';
+      '''
+        SELECT id, idempotency_key FROM sales_order
+        WHERE id BETWEEN 111001 AND 111002 ORDER BY id
+        ''';
     Source.DataSet := Master;
     Detail.Connection := Connection;
     Detail.SQL.Text :=
-      'SELECT id, order_id, line_no, product_id, quantity, unit_price ' +
-      'FROM sales_order_item WHERE order_id = :id ORDER BY line_no';
+      '''
+        SELECT id, order_id, line_no, product_id, quantity, unit_price
+        FROM sales_order_item WHERE order_id = :id ORDER BY line_no
+        ''';
     Detail.MasterSource := Source;
     Detail.MasterFields := 'id';
     Detail.DetailFields := 'order_id';
@@ -206,8 +220,10 @@ begin
       'SELECT id FROM sales_order WHERE id BETWEEN 111001 AND 111002 ORDER BY id';
     Detail.Connection := Connection;
     Detail.SQL.Text :=
-      'SELECT id, order_id, line_no FROM sales_order_item ' +
-      'WHERE order_id BETWEEN 111001 AND 111002 ORDER BY order_id, line_no';
+      '''
+        SELECT id, order_id, line_no FROM sales_order_item
+        WHERE order_id BETWEEN 111001 AND 111002 ORDER BY order_id, line_no
+        ''';
     Detail.IndexFieldNames := 'order_id';
     Source.DataSet := Master;
     Detail.MasterSource := Source;
@@ -246,15 +262,19 @@ begin
     Connection.StartTransaction;
     try
       Connection.ExecSQL(
-        'INSERT INTO sales_order (idempotency_key, order_status, total) ' +
-        'VALUES (''EX-11-GENERATED'', ''PENDING'', 30)');
+        '''
+          INSERT INTO sales_order (idempotency_key, order_status, total)
+          VALUES ('EX-11-GENERATED', 'PENDING', 30)
+          ''');
       GeneratedId := Connection.ExecSQLScalar(
         'SELECT id FROM sales_order WHERE idempotency_key = ''EX-11-GENERATED''');
       Check(GeneratedId > 0, 'Banco não devolveu uma identidade válida.');
       Connection.ExecSQL(
-        'INSERT INTO sales_order_item ' +
-        '(id, order_id, line_no, product_id, quantity, unit_price) ' +
-        'VALUES (113101, :order_id, 1, 3, 1, 30)', [GeneratedId]);
+        '''
+          INSERT INTO sales_order_item
+          (id, order_id, line_no, product_id, quantity, unit_price)
+          VALUES (113101, :order_id, 1, 3, 1, 30)
+          ''', [GeneratedId]);
       Connection.Commit;
     except
       if Connection.InTransaction then Connection.Rollback;
@@ -348,8 +368,10 @@ begin
     Source.DataSet := Master;
     Detail.Connection := Connection;
     Detail.SQL.Text :=
-      'SELECT id, order_id, line_no FROM sales_order_item ' +
-      'WHERE order_id = :id ORDER BY line_no';
+      '''
+        SELECT id, order_id, line_no FROM sales_order_item
+        WHERE order_id = :id ORDER BY line_no
+        ''';
     Detail.IndexFieldNames := 'order_id';
     Detail.MasterSource := Source;
     Detail.MasterFields := 'id';
@@ -462,8 +484,10 @@ begin
     Detail.SchemaAdapter := Adapter;
     Detail.CachedUpdates := True;
     Detail.SQL.Text :=
-      'SELECT id, order_id, line_no, product_id, quantity, unit_price ' +
-      'FROM sales_order_item WHERE order_id < 0';
+      '''
+        SELECT id, order_id, line_no, product_id, quantity, unit_price
+        FROM sales_order_item WHERE order_id < 0
+        ''';
     Detail.IndexFieldNames := 'order_id';
     Source.DataSet := Master;
     Detail.MasterSource := Source;
@@ -520,14 +544,18 @@ begin
     Master.SchemaAdapter := Adapter;
     Master.CachedUpdates := True;
     Master.SQL.Text :=
-      'SELECT id, idempotency_key, order_status, total FROM sales_order ' +
-      'WHERE id = 111001';
+      '''
+        SELECT id, idempotency_key, order_status, total FROM sales_order
+        WHERE id = 111001
+        ''';
     Detail.Connection := Connection;
     Detail.SchemaAdapter := Adapter;
     Detail.CachedUpdates := True;
     Detail.SQL.Text :=
-      'SELECT id, order_id, line_no, product_id, quantity, unit_price ' +
-      'FROM sales_order_item WHERE order_id = 111001 ORDER BY line_no';
+      '''
+        SELECT id, order_id, line_no, product_id, quantity, unit_price
+        FROM sales_order_item WHERE order_id = 111001 ORDER BY line_no
+        ''';
     Detail.IndexFieldNames := 'order_id';
     Source.DataSet := Master;
     Detail.MasterSource := Source;
@@ -581,15 +609,19 @@ begin
     Master.CachedUpdates := True;
     Master.UpdateOptions.KeyFields := 'id';
     Master.SQL.Text :=
-      'SELECT id, idempotency_key, order_status, total FROM sales_order ' +
-      'WHERE id = 111001';
+      '''
+        SELECT id, idempotency_key, order_status, total FROM sales_order
+        WHERE id = 111001
+        ''';
     Detail.Connection := Connection;
     Detail.SchemaAdapter := Adapter;
     Detail.CachedUpdates := True;
     Detail.UpdateOptions.KeyFields := 'id';
     Detail.SQL.Text :=
-      'SELECT id, order_id, line_no, product_id, quantity, unit_price ' +
-      'FROM sales_order_item WHERE order_id = 111001 ORDER BY line_no';
+      '''
+        SELECT id, order_id, line_no, product_id, quantity, unit_price
+        FROM sales_order_item WHERE order_id = 111001 ORDER BY line_no
+        ''';
     Detail.IndexFieldNames := 'order_id';
     Source.DataSet := Master;
     Detail.MasterSource := Source;
@@ -609,7 +641,7 @@ begin
         ErrorCount := Adapter.ApplyUpdates(0);
         ApplyFailed := ErrorCount > 0;
       except
-        on E: Exception do
+        on CaughtException: Exception do
           ApplyFailed := True;
       end;
       Check(ApplyFailed, 'ApplyUpdates deveria rejeitar quantidade zero.');
@@ -665,12 +697,16 @@ begin
     OrderQuery.UpdateOptions.KeyFields := 'id';
     OrderQuery.UpdateOptions.CountUpdatedRecords := True;
     OrderQuery.SQL.Text :=
-      'SELECT id, idempotency_key, order_status, total FROM sales_order ' +
-      'WHERE id = 111001';
+      '''
+        SELECT id, idempotency_key, order_status, total FROM sales_order
+        WHERE id = 111001
+        ''';
     UpdateSQL.Connection := Connection;
     UpdateSQL.ModifySQL.Text :=
-      'UPDATE sales_order SET total = :NEW_total ' +
-      'WHERE id = :OLD_id AND total = :OLD_total';
+      '''
+        UPDATE sales_order SET total = :NEW_total
+        WHERE id = :OLD_id AND total = :OLD_total
+        ''';
     OrderQuery.UpdateObject := UpdateSQL;
     OrderQuery.Open;
     DesiredTotal := 26;
@@ -686,7 +722,7 @@ begin
         ErrorCount := OrderQuery.ApplyUpdates(0);
         ConflictDetected := ErrorCount > 0;
       except
-        on E: Exception do
+        on CaughtException: Exception do
           ConflictDetected := True;
       end;
       Check(ConflictDetected, 'Atualização otimista não detectou a versão concorrente.');
@@ -739,8 +775,7 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter11Checks parameter|range|generated|cascade|atomic|' +
-    'cache|delay|composite|newdetails|conflict');
+  Writeln('Uso: Chapter11Checks parameter|range|generated|cascade|atomic|cache|delay|composite|newdetails|conflict');
 end;
 
 begin
@@ -768,9 +803,9 @@ begin
       ExitCode := 2;
     end;
   except
-    on E: Exception do
+    on CaughtException: Exception do
     begin
-      Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+      Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
       ExitCode := 1;
     end;
   end;

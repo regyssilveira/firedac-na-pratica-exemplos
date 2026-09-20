@@ -163,7 +163,7 @@ begin
     try
       FreeJson.LoadFromFile(FreeFile, sfFreeFormJSON);
     except
-      on E: Exception do
+      on CaughtException: Exception do
         FreeLoadedWithoutSchema := False;
     end;
     Check(FreeJson.Active and (FreeJson.RecordCount = 2),
@@ -294,7 +294,7 @@ begin
     try
       Recovery.LoadFromFile(FileName, sfBinary);
     except
-      on E: Exception do Failed := True;
+      on CaughtException: Exception do Failed := True;
     end;
     Check(Failed, 'Arquivo truncado foi aceito como cache válido.');
     if Recovery.Active then Recovery.Close;
@@ -317,7 +317,7 @@ var
   FileName, Architecture: string;
   Stopwatch: TStopwatch;
   WriteMs, ReadMs: Double;
-  I: Integer;
+  Index: Integer;
 begin
   Check((ACount > 0) and (ACount <= 100000),
     'Quantidade deve estar entre 1 e 100000.');
@@ -334,9 +334,9 @@ begin
     Source.CachedUpdates := False;
     Source.BeginBatch;
     try
-      for I := 1 to ACount do
-        Source.AppendRecord([Int64(I), 'Produto ' + IntToStr(I),
-          Currency((I mod 10000) / 100), Null,
+      for Index := 1 to ACount do
+        Source.AppendRecord([Int64(Index), 'Produto ' + IntToStr(Index),
+          Currency((Index mod 10000) / 100), Null,
           EncodeDateTime(2026, 9, 4, 12, 0, 0, 0), Null]);
     finally
       Source.EndBatch;
@@ -392,9 +392,9 @@ begin
         ExitCode := 2;
       end;
     except
-      on E: Exception do
+      on CaughtException: Exception do
       begin
-        Writeln(ErrOutput, E.ClassName, ': ', E.Message);
+        Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message);
         ExitCode := 1;
       end;
     end;
