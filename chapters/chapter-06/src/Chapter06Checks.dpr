@@ -93,24 +93,21 @@ end;
 procedure ConfigureOptionalParams(AQuery: TFDQuery; ACategory: Variant;
   AMinimumPrice: Variant);
 begin
-  with AQuery.ParamByName('category_id') do
-  begin
-    DataType := ftLargeint;
-    if VarIsNull(ACategory) then
-      Clear
-    else
-      AsLargeInt := ACategory;
-  end;
-  with AQuery.ParamByName('minimum_price') do
-  begin
-    DataType := ftFMTBcd;
-    Precision := 18;
-    NumericScale := 2;
-    if VarIsNull(AMinimumPrice) then
-      Clear
-    else
-      AsCurrency := AMinimumPrice;
-  end;
+  var CategoryParam := AQuery.ParamByName('category_id');
+  CategoryParam.DataType := ftLargeint;
+  if VarIsNull(ACategory) then
+    CategoryParam.Clear
+  else
+    CategoryParam.AsLargeInt := ACategory;
+
+  var MinimumPriceParam := AQuery.ParamByName('minimum_price');
+  MinimumPriceParam.DataType := ftFMTBcd;
+  MinimumPriceParam.Precision := 18;
+  MinimumPriceParam.NumericScale := 2;
+  if VarIsNull(AMinimumPrice) then
+    MinimumPriceParam.Clear
+  else
+    MinimumPriceParam.AsCurrency := AMinimumPrice;
 end;
 
 function SearchCount(AConnection: TFDConnection; ACategory,

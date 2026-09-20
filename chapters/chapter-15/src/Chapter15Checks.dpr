@@ -50,14 +50,12 @@ procedure DefineCache(ATable: TFDMemTable);
 begin
   ATable.FieldDefs.Add('id', ftLargeint, 0, True);
   ATable.FieldDefs.Add('name', ftWideString, 100, True);
-  with ATable.FieldDefs.AddFieldDef do
-  begin
-    Name := 'price';
-    DataType := ftFMTBcd;
-    Precision := 18;
-    Size := 2;
-    Required := True;
-  end;
+  var PriceDef := ATable.FieldDefs.AddFieldDef;
+  PriceDef.Name := 'price';
+  PriceDef.DataType := ftFMTBcd;
+  PriceDef.Precision := 18;
+  PriceDef.Size := 2;
+  PriceDef.Required := True;
   ATable.FieldDefs.Add('note', ftWideString, 200, False);
   ATable.FieldDefs.Add('changed_at', ftDateTime, 0, True);
   ATable.FieldDefs.Add('payload', ftBlob, 0, False);

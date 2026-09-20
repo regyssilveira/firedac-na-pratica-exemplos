@@ -125,11 +125,9 @@ begin
   Script := TFDScript.Create(nil);
   try
     Script.Connection := AConnection;
-    with Script.SQLScripts.Add do
-    begin
-      Name := TPath.GetFileName(AFileName);
-      SQL.LoadFromFile(AFileName, TEncoding.UTF8);
-    end;
+    var MigrationScript := Script.SQLScripts.Add;
+    MigrationScript.Name := TPath.GetFileName(AFileName);
+    MigrationScript.SQL.LoadFromFile(AFileName, TEncoding.UTF8);
     Script.ValidateAll;
     Script.ExecuteAll;
   finally

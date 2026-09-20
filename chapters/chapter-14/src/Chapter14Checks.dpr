@@ -26,22 +26,19 @@ begin
   ATable.FieldDefs.Add('sku', ftWideString, 40, True);
   ATable.FieldDefs.Add('name', ftWideString, 160, True);
   ATable.FieldDefs.Add('quantity', ftInteger, 0, True);
-  with ATable.FieldDefs.AddFieldDef do
-  begin
-    Name := 'unit_price';
-    DataType := ftFMTBcd;
-    Precision := 18;
-    Size := 2;
-    Required := True;
-  end;
-  with ATable.FieldDefs.AddFieldDef do
-  begin
-    Name := 'line_total';
-    DataType := ftFMTBcd;
-    Precision := 18;
-    Size := 2;
-    Required := True;
-  end;
+  var UnitPriceDef := ATable.FieldDefs.AddFieldDef;
+  UnitPriceDef.Name := 'unit_price';
+  UnitPriceDef.DataType := ftFMTBcd;
+  UnitPriceDef.Precision := 18;
+  UnitPriceDef.Size := 2;
+  UnitPriceDef.Required := True;
+
+  var LineTotalDef := ATable.FieldDefs.AddFieldDef;
+  LineTotalDef.Name := 'line_total';
+  LineTotalDef.DataType := ftFMTBcd;
+  LineTotalDef.Precision := 18;
+  LineTotalDef.Size := 2;
+  LineTotalDef.Required := True;
   ATable.CreateDataSet;
   ATable.AddIndex('ux_item', 'item_id', '', [soUnique]);
   ATable.AddIndex('ix_product', 'product_id', '', []);
