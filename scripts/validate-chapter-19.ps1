@@ -35,7 +35,7 @@ foreach ($arch in @('Win32','Win64')) {
   $exe=".deps\build\$arch\chapter-19\Chapter19Checks.exe"
   foreach ($driver in @('SQLite','FB')) {
     $env:CH19_DRIVER=$driver
-    foreach ($mode in @('async','cancel','tasks','pool','saturation')) {
+    foreach ($mode in @('async','cancel','tasks','generation','pool','saturation')) {
       $result=& $exe $mode
       if ($LASTEXITCODE -ne 0) { throw "$mode/$driver/$arch falhou: $result" }
       Write-Output $result

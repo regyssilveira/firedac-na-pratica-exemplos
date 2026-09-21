@@ -927,6 +927,13 @@
       "evidence": ["chapters/chapter-19/evidence/README.md"]
     },
     {
+      "id": "EX-19-06",
+      "chapter": 19,
+      "title": "Guarda de geração e ownership do resultado",
+      "status": "RV",
+      "evidence": ["chapters/chapter-19/evidence/README.md"]
+    },
+    {
       "id": "EX-20-01",
       "chapter": 20,
       "title": "Listagem de catálogos/schemas/tabelas",

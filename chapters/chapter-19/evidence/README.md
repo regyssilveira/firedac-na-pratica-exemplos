@@ -1,10 +1,15 @@
 # Evidência do capítulo 19
 
-EX-19-01–05 são repetidos em SQLite/Firebird e Win32/Win64. O teste não compartilha
+EX-19-01–06 são repetidos em SQLite/Firebird e Win32/Win64. O teste não compartilha
 conexões ou queries entre workers: cada `TTask` cria e destrói os próprios componentes.
 O pool é registrado antes das tasks, limitado a quatro leases no teste concorrente e
 a dois no teste de saturação. O terceiro lease é rejeitado e uma nova aquisição passa
 depois da devolução.
+
+EX-19-06 iniciou duas buscas com gerações 1 e 2 e atrasou deliberadamente a primeira.
+Os callbacks foram entregues pela fila da thread principal: somente a geração 2 foi
+publicada, a geração 1 foi descartada e ambos os objetos de resultado tiveram um
+único consumidor responsável por liberá-los.
 
 `bm-08-raw.csv` e `bm-09-raw.csv` contêm dez repetições por combinação. Durações são
 resultados do laboratório, não garantias. BM-09 mantém cem mil linhas nas variantes;

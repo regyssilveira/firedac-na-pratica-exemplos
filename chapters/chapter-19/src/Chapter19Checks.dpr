@@ -42,6 +42,30 @@ type
     procedure HandleError(ASender, AInitiator: TObject; var AException: Exception);
   end;
 
+  TSearchResult = class
+  public
+    Generation: Integer;
+    Value: string;
+    constructor Create(AGeneration: Integer; const AValue: string);
+  end;
+
+  TGenerationController = class
+  private
+    FCurrentGeneration: Integer;
+    FDeliveredCount: Integer;
+    FDiscardedCount: Integer;
+    FPublishedValue: string;
+    FCompleted: TEvent;
+  public
+    constructor Create(ACurrentGeneration: Integer);
+    destructor Destroy; override;
+    procedure Accept(AResult: TSearchResult);
+    property Completed: TEvent read FCompleted;
+    property DeliveredCount: Integer read FDeliveredCount;
+    property DiscardedCount: Integer read FDiscardedCount;
+    property PublishedValue: string read FPublishedValue;
+  end;
+
 constructor TAsyncObserver.Create;
 begin
   inherited Create;
@@ -64,6 +88,43 @@ procedure TAsyncObserver.HandleError(ASender, AInitiator: TObject;
 begin
   ErrorSeen := True;
   ErrorClass := AException.ClassName;
+end;
+
+constructor TSearchResult.Create(AGeneration: Integer; const AValue: string);
+begin
+  inherited Create;
+  Generation := AGeneration;
+  Value := AValue;
+end;
+
+constructor TGenerationController.Create(ACurrentGeneration: Integer);
+begin
+  inherited Create;
+  FCurrentGeneration := ACurrentGeneration;
+  FCompleted := TEvent.Create(nil, True, False, '');
+end;
+
+destructor TGenerationController.Destroy;
+begin
+  FCompleted.Free;
+  inherited Destroy;
+end;
+
+procedure TGenerationController.Accept(AResult: TSearchResult);
+begin
+  try
+    if AResult.Generation = FCurrentGeneration then
+    begin
+      Inc(FDeliveredCount);
+      FPublishedValue := AResult.Value;
+    end
+    else
+      Inc(FDiscardedCount);
+    if FDeliveredCount + FDiscardedCount = 2 then
+      FCompleted.SetEvent;
+  finally
+    AResult.Free;
+  end;
 end;
 
 procedure Check(ACondition: Boolean; const AMessage: string);
@@ -261,6 +322,49 @@ begin
   Writeln(Format('EX-19-03 tasks=%d successes=%d ownership=per_task', [Count, Success]));
 end;
 
+procedure QueueSearchResult(AController: TGenerationController;
+  AGeneration, ADelayMilliseconds: Integer; const AValue: string;
+  out ATask: ITask);
+begin
+  ATask := TTask.Run(TProc(
+    procedure
+    var
+      ResultData: TSearchResult;
+    begin
+      Sleep(ADelayMilliseconds);
+      ResultData := TSearchResult.Create(AGeneration, AValue);
+      TThread.Queue(nil,
+        procedure
+        begin
+          AController.Accept(ResultData);
+        end);
+    end));
+end;
+
+procedure RunGenerationGuard;
+var
+  Controller: TGenerationController;
+  OlderTask: ITask;
+  CurrentTask: ITask;
+begin
+  Controller := TGenerationController.Create(2);
+  try
+    QueueSearchResult(Controller, 1, 50, 'resultado antigo', OlderTask);
+    QueueSearchResult(Controller, 2, 5, 'resultado atual', CurrentTask);
+    TTask.WaitForAll([OlderTask, CurrentTask]);
+    WaitEvent(Controller.Completed);
+    Check(Controller.DeliveredCount = 1,
+      'A geração atual deveria ser publicada exatamente uma vez.');
+    Check(Controller.DiscardedCount = 1,
+      'A geração antiga deveria ser descartada exatamente uma vez.');
+    Check(Controller.PublishedValue = 'resultado atual',
+      'Uma resposta obsoleta venceu a geração atual.');
+    Writeln('EX-19-06 delivered=1 discarded=1 ownership=single_transfer');
+  finally
+    Controller.Free;
+  end;
+end;
+
 procedure AddDefinition(const AName: string; APooled: Boolean; AMaximum: Integer);
 var ConnectionParams: TStringList;
 begin
@@ -370,10 +474,11 @@ begin
   try
     if IsFirebird then DriverLink.VendorLib := RequiredEnvironment('FIRESTORE_FBCLIENT');
     FDManager.Active := True;
-    if ParamCount <> 1 then raise Exception.Create('Uso: Chapter19Checks async|cancel|tasks|pool|saturation|bench|poolbench');
+    if ParamCount <> 1 then raise Exception.Create('Uso: Chapter19Checks async|cancel|tasks|generation|pool|saturation|bench|poolbench');
     if SameText(ParamStr(1), 'async') then RunAsync
     else if SameText(ParamStr(1), 'cancel') then RunCancel
     else if SameText(ParamStr(1), 'tasks') then RunTasks
+    else if SameText(ParamStr(1), 'generation') then RunGenerationGuard
     else if SameText(ParamStr(1), 'pool') then RunPool
     else if SameText(ParamStr(1), 'saturation') then RunSaturation
     else if SameText(ParamStr(1), 'bench') then RunBench
