@@ -5,6 +5,8 @@ program Chapter21Checks;
 uses
   System.SysUtils,
   System.Classes,
+  System.JSON,
+  System.StrUtils,
   System.Variants,
   Data.DB,
   FireDAC.Stan.Intf,
@@ -197,13 +199,130 @@ begin
   finally Connection.Free; Link.Free; end;
 end;
 
+function ErrorKindName(AKind: TFDCommandExceptionKind): string;
+begin
+  case AKind of
+    ekUKViolated: Result := 'unique_constraint';
+    ekFKViolated: Result := 'foreign_key';
+    ekRecordLocked: Result := 'concurrency';
+    ekUserPwdInvalid: Result := 'authentication';
+    ekCmdAborted: Result := 'cancelled';
+    ekServerGone: Result := 'connection_lost';
+    ekObjNotExists, ekInvalidParams: Result := 'programming';
+  else
+    Result := 'database_other';
+  end;
+end;
+
+function ClassifyDatabaseException(
+  AException: EFDDBEngineException): string;
+var
+  ErrorIndex: Integer;
+begin
+  for ErrorIndex := 0 to AException.ErrorCount - 1 do
+    if (AException.Errors[ErrorIndex].Kind = ekUKViolated) or
+       (AException.Errors[ErrorIndex].ErrorCode = 1555) or
+       (AException.Errors[ErrorIndex].ErrorCode = 2067) or
+       (AException.Errors[ErrorIndex].ErrorCode = 335544334) or
+       (AException.Errors[ErrorIndex].ErrorCode = 335544665) then
+      Exit('unique_constraint');
+  Result := ErrorKindName(AException.Kind);
+end;
+
+function BuildDatabaseErrorLog(AException: EFDDBEngineException;
+  const ACorrelationId: string; ADurationMilliseconds: Int64): string;
+var
+  LogObject: TJSONObject;
+  FirstError: TFDDBError;
+begin
+  LogObject := TJSONObject.Create;
+  try
+    LogObject.AddPair('event', 'product.insert.failed');
+    LogObject.AddPair('correlationId', ACorrelationId);
+    LogObject.AddPair('driver', IfThen(IsFirebird, 'FB', 'SQLite'));
+    LogObject.AddPair('durationMs', TJSONNumber.Create(ADurationMilliseconds));
+    LogObject.AddPair('category', ClassifyDatabaseException(AException));
+    LogObject.AddPair('retryable', TJSONBool.Create(False));
+    LogObject.AddPair('errorCount', TJSONNumber.Create(AException.ErrorCount));
+    if AException.ErrorCount > 0 then
+    begin
+      FirstError := AException.Errors[0];
+      LogObject.AddPair('nativeCode', TJSONNumber.Create(FirstError.ErrorCode));
+      LogObject.AddPair('rowIndex', TJSONNumber.Create(FirstError.RowIndex));
+    end;
+    Result := LogObject.ToJSON;
+  finally
+    LogObject.Free;
+  end;
+end;
+
+procedure RunStructuredDiagnostics;
+const
+  CorrelationId = 'EX-21-06-CORRELATION';
+var
+  Link: TFDPhysFBDriverLink;
+  Connection: TFDConnection;
+  LogText: string;
+  ParsedLog: TJSONValue;
+  LogObject: TJSONObject;
+  StructuredErrorSeen: Boolean;
+begin
+  Link := TFDPhysFBDriverLink.Create(nil);
+  Connection := NewConnection(Link);
+  try
+    StructuredErrorSeen := False;
+    LogText := '';
+    try
+      Connection.ExecSQL(
+        '''
+          INSERT INTO product
+          (id, sku, name, category_id, price, active)
+          VALUES (1, 'SENSITIVE-SKU', 'Sensitive name', 1, 10, 1)
+          ''');
+    except
+      on CaughtException: EFDDBEngineException do
+      begin
+        StructuredErrorSeen :=
+          ClassifyDatabaseException(CaughtException) = 'unique_constraint';
+        LogText := BuildDatabaseErrorLog(
+          CaughtException, CorrelationId, 1);
+      end;
+    end;
+    Check(StructuredErrorSeen,
+      'A violação de chave única não recebeu classificação estruturada.');
+    Check(LogText <> '', 'O evento JSON não foi produzido.');
+    Check(Pos('SENSITIVE-SKU', LogText) = 0,
+      'O log expôs um valor de parâmetro sensível.');
+    Check(Pos('INSERT INTO', UpperCase(LogText)) = 0,
+      'O log expôs o SQL completo.');
+    ParsedLog := TJSONObject.ParseJSONValue(LogText);
+    try
+      Check(ParsedLog is TJSONObject, 'O log produzido não é um objeto JSON.');
+      LogObject := TJSONObject(ParsedLog);
+      Check(LogObject.GetValue<string>('correlationId') = CorrelationId,
+        'O correlation ID não atravessou a fronteira de erro.');
+      Check(LogObject.GetValue<string>('category') = 'unique_constraint',
+        'A categoria estável do domínio divergiu.');
+      Check(not LogObject.GetValue<Boolean>('retryable'),
+        'Violação de chave única não deveria receber retry automático.');
+    finally
+      ParsedLog.Free;
+    end;
+    Writeln('EX-21-06 ', LogText);
+  finally
+    Connection.Free;
+    Link.Free;
+  end;
+end;
+
 begin
   try
-    if ParamCount <> 1 then raise Exception.Create('Uso: Chapter21Checks recovery|retry|security|smoke');
+    if ParamCount <> 1 then raise Exception.Create('Uso: Chapter21Checks recovery|retry|security|smoke|diagnostics');
     if SameText(ParamStr(1), 'recovery') then RunRecovery
     else if SameText(ParamStr(1), 'retry') then RunRetry
     else if SameText(ParamStr(1), 'security') then RunSecurity
     else if SameText(ParamStr(1), 'smoke') then RunSmoke
+    else if SameText(ParamStr(1), 'diagnostics') then RunStructuredDiagnostics
     else raise Exception.Create('Modo inválido.');
   except on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end; end;
 end.

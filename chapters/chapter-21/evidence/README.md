@@ -1,6 +1,6 @@
 # Evidência do capítulo 21
 
-EX-21-01, 02 e 05 foram executados em SQLite/Firebird e Win32/Win64. No Firebird, o
+EX-21-01, 02, 05 e 06 foram executados em SQLite/Firebird e Win32/Win64. No Firebird, o
 validador encerrou a attachment da aplicação por uma conexão administrativa. Com
 `AutoReconnect=True` e `faRetry`, a consulta voltou em outra attachment e observamos
 `OnRecover=1`, `OnRestored=1`, `OnLost=0`. O caminho recuperado não dispara todos os
@@ -25,3 +25,10 @@ o estado permanece `EC` até execução em VM limpa.
 EX-21-05 confirmou oito migrations, três produtos e rollback de estoque. O Firebird
 foi copiado por `gbak`, restaurado em outro arquivo e o mesmo smoke test passou sobre
 a restauração. Senhas foram fornecidas por ambiente, não pela linha de comando.
+
+EX-21-06 provocou uma violação de chave única real e percorreu os itens de
+`EFDDBEngineException`. A classificação combinou `Kind` e allowlist de códigos
+nativos: SQLite 1555 e Firebird 335544334. O evento JSON preservou correlation ID,
+driver, duração, categoria, decisão de retry, quantidade de erros, código nativo e
+índice da linha. As asserções também impediram a presença do SQL e dos valores
+sensíveis usados deliberadamente no comando.

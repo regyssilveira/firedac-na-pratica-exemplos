@@ -470,6 +470,15 @@
       ]
     },
     {
+      "id": "EX-10-06",
+      "chapter": 10,
+      "title": "Retry classificado em nova transação",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-10/evidence/README.md"
+      ]
+    },
+    {
       "id": "EX-11-01",
       "chapter": 11,
       "title": "Mestre-detalhe por parâmetros",
@@ -1000,6 +1009,13 @@
       "id": "EX-21-05",
       "chapter": 21,
       "title": "FireStore integrado",
+      "status": "RV",
+      "evidence": ["chapters/chapter-21/evidence/README.md"]
+    },
+    {
+      "id": "EX-21-06",
+      "chapter": 21,
+      "title": "Erro estruturado e log correlacionado",
       "status": "RV",
       "evidence": ["chapters/chapter-21/evidence/README.md"]
     }

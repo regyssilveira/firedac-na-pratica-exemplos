@@ -46,7 +46,7 @@ foreach ($architecture in @('Win32', 'Win64')) {
 
   foreach ($driver in @('SQLite', 'FB')) {
     $env:CH10_DRIVER = $driver
-    foreach ($mode in @('commit', 'rollback', 'nested', 'isolation', 'helper')) {
+    foreach ($mode in @('commit', 'rollback', 'nested', 'isolation', 'helper', 'retry')) {
       & $executable $mode
       if ($LASTEXITCODE -ne 0) {
         throw "Teste $mode/$driver/$architecture falhou."

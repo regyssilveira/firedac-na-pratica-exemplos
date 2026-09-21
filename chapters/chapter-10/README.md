@@ -5,6 +5,7 @@
 - `nested`: reverte somente o trabalho interno com nesting/savepoint;
 - `isolation`: observa quatro níveis com duas conexões independentes;
 - `helper`: testa ownership, commit, rollback e participação em transação externa.
+- `retry`: classifica conflito de lock, reverte e repete em nova transação.
 
 ```powershell
 .\scripts\validate-chapter-10.ps1 `

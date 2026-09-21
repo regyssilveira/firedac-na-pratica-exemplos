@@ -463,9 +463,88 @@ begin
   end;
 end;
 
+function IsRetryableLock(AException: EFDDBEngineException): Boolean;
+var
+  ErrorIndex: Integer;
+  NormalizedMessage: string;
+begin
+  Result := False;
+  for ErrorIndex := 0 to AException.ErrorCount - 1 do
+  begin
+    NormalizedMessage := LowerCase(AException.Errors[ErrorIndex].Message);
+    if (AException.Errors[ErrorIndex].ErrorCode = 5) or
+       (Pos('database is locked', NormalizedMessage) > 0) or
+       (Pos('database table is locked', NormalizedMessage) > 0) or
+       (Pos('lock conflict', NormalizedMessage) > 0) or
+       (Pos('deadlock', NormalizedMessage) > 0) then
+      Exit(True);
+  end;
+end;
+
+procedure RunClassifiedRetry;
+const
+  MaxAttempts = 2;
+var
+  Link: TFDPhysFBDriverLink;
+  BlockingConnection: TFDConnection;
+  WorkerConnection: TFDConnection;
+  Attempt: Integer;
+  Completed: Boolean;
+  RetryableSeen: Boolean;
+begin
+  Link := TFDPhysFBDriverLink.Create(nil);
+  BlockingConnection := NewConnection(Link);
+  WorkerConnection := NewConnection(Link);
+  try
+    BlockingConnection.StartTransaction;
+    BlockingConnection.ExecSQL(
+      'UPDATE product SET price = price WHERE id = 3');
+    Completed := False;
+    RetryableSeen := False;
+    for Attempt := 1 to MaxAttempts do
+    begin
+      try
+        WorkerConnection.StartTransaction;
+        WorkerConnection.ExecSQL(
+          'UPDATE product SET price = price WHERE id = 3');
+        WorkerConnection.Commit;
+        Completed := True;
+        Break;
+      except
+        on CaughtException: EFDDBEngineException do
+        begin
+          if WorkerConnection.InTransaction then
+            WorkerConnection.Rollback;
+          if (Attempt = MaxAttempts) or
+             not IsRetryableLock(CaughtException) then
+            raise;
+          RetryableSeen := True;
+          BlockingConnection.Rollback;
+          Sleep(Attempt * 10);
+        end;
+      end;
+    end;
+    Check(RetryableSeen,
+      'O primeiro conflito deveria ser classificado como transitório.');
+    Check(Completed,
+      'A nova transação não concluiu depois da liberação do lock.');
+    Check(not WorkerConnection.InTransaction,
+      'O retry deixou uma transação ativa.');
+    Writeln('EX-10-06 attempts=2 classified=retryable new_transaction=True');
+  finally
+    if WorkerConnection.InTransaction then
+      WorkerConnection.Rollback;
+    if BlockingConnection.InTransaction then
+      BlockingConnection.Rollback;
+    WorkerConnection.Free;
+    BlockingConnection.Free;
+    Link.Free;
+  end;
+end;
+
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter10Checks commit|rollback|nested|isolation|helper');
+  Writeln('Uso: Chapter10Checks commit|rollback|nested|isolation|helper|retry');
 end;
 
 begin
@@ -480,6 +559,7 @@ begin
     else if SameText(ParamStr(1), 'nested') then RunNestedSavepoint
     else if SameText(ParamStr(1), 'isolation') then RunIsolationMatrix
     else if SameText(ParamStr(1), 'helper') then RunTransactionHelper
+    else if SameText(ParamStr(1), 'retry') then RunClassifiedRetry
     else
     begin
       ShowUsage;

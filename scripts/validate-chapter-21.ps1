@@ -25,7 +25,7 @@ foreach($arch in @('Win32','Win64')){
   $exe=".deps\build\$arch\chapter-21\Chapter21Checks.exe"
   foreach($driver in @('SQLite','FB')){
     $env:CH21_DRIVER=$driver
-    foreach($mode in @('recovery','retry','security','smoke')){
+    foreach($mode in @('recovery','retry','security','smoke','diagnostics')){
       $result=&$exe $mode;if($LASTEXITCODE-ne 0){throw "$mode/$driver/$arch falhou: $result"};Write-Output $result
     }
   }

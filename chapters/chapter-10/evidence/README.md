@@ -16,6 +16,7 @@ Comando reproduzível: `scripts/validate-chapter-10.ps1`.
 | EX-10-03 — nesting/savepoint | aprovado | aprovado | aprovado | aprovado |
 | EX-10-04 — quatro isolamentos | aprovado | aprovado | aprovado | aprovado |
 | EX-10-05 — helper transacional | aprovado | aprovado | aprovado | aprovado |
+| EX-10-06 — retry classificado | aprovado | aprovado | aprovado | aprovado |
 
 ## Unidade de negócio
 
@@ -64,10 +65,18 @@ o callback bem-sucedido. Diante de falha intencional, reverteu sua unidade e pre
 a exceção original. Quando chamado dentro de uma transação externa, não confirmou nem
 encerrou a unidade do chamador; o rollback externo removeu seu trabalho.
 
+## Retry classificado
+
+EX-10-06 manteve um lock real numa conexão e tentou atualizar a mesma linha em outra.
+O erro nativo foi aceito somente quando correspondia ao conflito transitório conhecido
+do driver. A tentativa falha sofreu rollback, o bloqueio foi liberado e a segunda
+tentativa abriu uma nova transação e concluiu. O ensaio não classifica violações de
+integridade nem resultado incerto de commit como repetíveis.
+
 ## Limites
 
-O ensaio não simula perda de rede durante commit, deadlock circular, retaining nem
-retry. A matriz não substitui documentação do SGBD nem teste da carga real. Esses
+O ensaio não simula perda de rede durante commit, deadlock circular nem retaining.
+A matriz não substitui documentação do SGBD nem teste da carga real. Esses
 limites permanecem explícitos no manuscrito e nos capítulos de concorrência e
 recuperação.
 
@@ -78,5 +87,5 @@ efeitos da unidade de pedido, distingue constraint nativa de exceção de contro
 descreve nesting como savepoint e publica a matriz efetivamente observada. O helper
 expõe ownership e foi revisado nos três caminhos executados.
 
-EX-10-01 a EX-10-05 podem avançar a `RV`. As limitações sobre retaining, deadlock,
-retry, perda de rede e generalização de isolamento permanecem explícitas.
+EX-10-01 a EX-10-06 podem avançar a `RV`. As limitações sobre retaining, deadlock,
+perda de rede e generalização de isolamento permanecem explícitas.

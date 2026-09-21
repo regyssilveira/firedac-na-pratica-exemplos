@@ -2,7 +2,7 @@
 
 O laboratório cobre recovery por nova attachment Firebird, retry idempotente,
 WireCrypt, TLS PostgreSQL com `verify-full`, falhas de hostname e CA, pacote nativo
-por arquitetura, restore e smoke test.
+por arquitetura, restore, smoke test e diagnóstico estruturado correlacionado.
 
 ```powershell
 .\scripts\validate-chapter-21.ps1 -AdminPassword '<senha>' -AppPassword '<senha>'
