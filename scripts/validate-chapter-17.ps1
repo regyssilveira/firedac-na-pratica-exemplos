@@ -36,7 +36,7 @@ foreach ($architecture in @('Win32', 'Win64')) {
   $executable = ".deps\build\$architecture\chapter-17\Chapter17Checks.exe"
   foreach ($driver in @('SQLite', 'FB')) {
     $env:CH17_DRIVER = $driver
-    foreach ($mode in @('memtable', 'csv', 'connections', 'aggregate', 'limits')) {
+    foreach ($mode in @('memtable', 'csv', 'connections', 'aggregate', 'limits', 'ondemand')) {
       & $executable $mode
       if ($LASTEXITCODE -ne 0) { throw "Teste $mode/$driver/$architecture falhou." }
     }

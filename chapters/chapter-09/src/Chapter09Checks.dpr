@@ -467,6 +467,44 @@ begin
     end);
 end;
 
+procedure RunTimeout;
+begin
+  WithConnection(
+    procedure(Connection: TFDConnection)
+    var
+      Query: TFDQuery;
+      Timer: TStopwatch;
+      ElapsedMs: Int64;
+      TimeoutDetected: Boolean;
+    begin
+      Query := TFDQuery.Create(nil);
+      try
+        Query.Connection := Connection;
+        Query.ResourceOptions.CmdExecMode := amBlocking;
+        Query.ResourceOptions.CmdExecTimeout := 50;
+        Query.SQL.Text := SlowCommandSql;
+        TimeoutDetected := False;
+        Timer := TStopwatch.StartNew;
+        try
+          Query.ExecSQL;
+        except
+          on CaughtException: EFDException do
+            TimeoutDetected := True;
+        end;
+        ElapsedMs := Timer.ElapsedMilliseconds;
+        Check(TimeoutDetected, 'O comando lento não produziu timeout.');
+        Check(ElapsedMs < 10000, 'O timeout não limitou a espera do chamador.');
+        Check(Connection.ExecSQLScalar('SELECT COUNT(*) FROM product') = 3,
+          'A conexão não respondeu depois do timeout.');
+        Writeln(Format(
+          'EX-09-06 aprovado: timeout_ms=50 elapsed_ms=%d connection_reusable=True.',
+          [ElapsedMs]));
+      finally
+        Query.Free;
+      end;
+    end);
+end;
+
 procedure ApplyFeedback(AState: TLoadState; AStatus: TLabel;
   ASearch, ACancel: TButton);
 begin
@@ -524,7 +562,7 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter09Checks ondemand|all|blob|cancel|feedback|benchmark-blob-immediate|benchmark-blob-deferred|benchmark-blob-stream');
+  Writeln('Uso: Chapter09Checks ondemand|all|blob|cancel|timeout|feedback|benchmark-blob-immediate|benchmark-blob-deferred|benchmark-blob-stream');
 end;
 
 begin
@@ -545,6 +583,8 @@ begin
       RunDeferredBlob
     else if SameText(ParamStr(1), 'cancel') then
       RunCancellation
+    else if SameText(ParamStr(1), 'timeout') then
+      RunTimeout
     else if SameText(ParamStr(1), 'feedback') then
       RunFeedback
     else if SameText(ParamStr(1), 'benchmark-blob-immediate') then

@@ -16,6 +16,7 @@ Comando reproduzível: `scripts/validate-chapter-09.ps1`.
 | EX-09-03 — BLOB sob demanda | aprovado | aprovado | aprovado | aprovado |
 | EX-09-04 — cancelamento | aprovado | aprovado | aprovado | aprovado |
 | EX-09-05 — feedback VCL | aprovado | aprovado | aprovado | aprovado |
+| EX-09-06 — timeout e reutilização | aprovado | aprovado | aprovado | aprovado |
 
 O exemplo visual independe do driver e foi executado nos binários Win32 e Win64.
 Todos os demais exemplos foram executados contra os dois bancos em ambas as
@@ -65,6 +66,11 @@ primeira disparasse a segunda depois do primeiro cancelamento. O exemplo final u
 execução com cancelamento de fetch.
 
 ## Interface e instrumentação
+
+EX-09-06 configurou `CmdExecTimeout = 50` sobre o mesmo comando lento usado pelo
+ensaio de cancelamento. Os quatro perfis produziram exceção de timeout antes do
+limite de segurança de dez segundos e aceitaram imediatamente uma consulta de
+sanidade na mesma conexão.
 
 O ensaio VCL verificou cinco estados: carregando, resultado parcial, concluído,
 cancelado e falhou, incluindo a habilitação coerente dos botões de busca e
@@ -119,6 +125,6 @@ expõe o fetch tardio real do BLOB e separa cancelamento de execução das fases
 abertura e fetch. Também registra a interferência do monitor e o teardown seguro da
 operação assíncrona.
 
-EX-09-01 a EX-09-05 podem avançar a `RV`. Cada afirmação apresentada como resultado
+EX-09-01 a EX-09-06 podem avançar a `RV`. Cada afirmação apresentada como resultado
 possui asserção nos binários correspondentes ou evidência nos quatro traces; os
 limites de benchmark e de generalização entre drivers permanecem explícitos.

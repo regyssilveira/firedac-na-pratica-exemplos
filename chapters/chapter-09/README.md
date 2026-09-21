@@ -6,6 +6,8 @@
 - `blob`: remove `fiBlobs` e acessa depois um BLOB de 8 KiB;
 - `cancel`: inicia um comando assíncrono sem result set, chama `AbortJob`, drena a
   notificação de conclusão e reutiliza a conexão;
+- `timeout`: limita um comando bloqueante lento a 50 ms, reconhece a exceção e
+  confirma que a conexão continua utilizável;
 - `feedback`: instancia controles VCL e valida cinco estados da interface.
 
 Os modos `benchmark-blob-immediate`, `benchmark-blob-deferred` e

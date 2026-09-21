@@ -28,6 +28,37 @@ uses
   FireDAC.Comp.BatchMove.Text,
   FireDAC.Comp.BatchMove.DataSet;
 
+type
+  TDataSetResolver = class
+  private
+    FProducts: TDataSet;
+  public
+    ResolveCount: Integer;
+    constructor Create(AProducts: TDataSet);
+    procedure HandleGetDataSet(ASender: TObject;
+      const ASchemaName, AName: string; var ADataSet: TDataSet;
+      var AOwned: Boolean);
+  end;
+
+constructor TDataSetResolver.Create(AProducts: TDataSet);
+begin
+  inherited Create;
+  FProducts := AProducts;
+end;
+
+procedure TDataSetResolver.HandleGetDataSet(ASender: TObject;
+  const ASchemaName, AName: string; var ADataSet: TDataSet;
+  var AOwned: Boolean);
+begin
+  ADataSet := nil;
+  AOwned := False;
+  if SameText(ASchemaName, 'snapshot') and SameText(AName, 'products') then
+  begin
+    ADataSet := FProducts;
+    Inc(ResolveCount);
+  end;
+end;
+
 procedure Check(ACondition: Boolean; const AMessage: string);
 begin
   if not ACondition then raise Exception.Create(AMessage);
@@ -363,9 +394,58 @@ begin
   end;
 end;
 
+procedure RunOnDemandResolution;
+var
+  Products: TFDMemTable;
+  Connection: TFDConnection;
+  LocalSQL: TFDLocalSQL;
+  Query: TFDQuery;
+  Resolver: TDataSetResolver;
+  UnknownRejected: Boolean;
+begin
+  Products := TFDMemTable.Create(nil);
+  Connection := TFDConnection.Create(nil);
+  LocalSQL := TFDLocalSQL.Create(nil);
+  Query := TFDQuery.Create(nil);
+  Resolver := TDataSetResolver.Create(Products);
+  try
+    DefineProducts(Products);
+    SeedProducts(Products);
+    ConfigureLocal(Connection, LocalSQL);
+    LocalSQL.OnGetDataSet := Resolver.HandleGetDataSet;
+    LocalSQL.Active := True;
+
+    Query.Connection := Connection;
+    Query.SQL.Text := 'SELECT COUNT(*) FROM snapshot.products';
+    Query.Open;
+    Check(Query.Fields[0].AsInteger = 3,
+      'A fonte permitida não retornou os três produtos.');
+    Check(Resolver.ResolveCount = 1,
+      'A resolução sob demanda não ocorreu exatamente uma vez.');
+    Query.Close;
+
+    UnknownRejected := False;
+    try
+      Query.SQL.Text := 'SELECT COUNT(*) FROM snapshot.unknown_source';
+      Query.Open;
+    except
+      on CaughtException: EFDException do
+        UnknownRejected := True;
+    end;
+    Check(UnknownRejected, 'Uma fonte fora da allowlist foi aceita.');
+    Writeln('EX-17-06 aprovado: resolução allowlist=1; fonte desconhecida rejeitada; owned=False.');
+  finally
+    Resolver.Free;
+    Query.Free;
+    LocalSQL.Free;
+    Connection.Free;
+    Products.Free;
+  end;
+end;
+
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter17Checks memtable|csv|connections|aggregate|limits');
+  Writeln('Uso: Chapter17Checks memtable|csv|connections|aggregate|limits|ondemand');
 end;
 
 begin
@@ -376,6 +456,7 @@ begin
     else if SameText(ParamStr(1), 'connections') then RunTwoConnections
     else if SameText(ParamStr(1), 'aggregate') then RunAggregate
     else if SameText(ParamStr(1), 'limits') then RunLimits
+    else if SameText(ParamStr(1), 'ondemand') then RunOnDemandResolution
     else begin ShowUsage; ExitCode := 2; end;
   except
     on CaughtException: Exception do begin Writeln(ErrOutput, CaughtException.ClassName, ': ', CaughtException.Message); ExitCode := 1; end;

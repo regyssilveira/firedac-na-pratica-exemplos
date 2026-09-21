@@ -8,7 +8,9 @@ Validação executada com FireDAC 37 em SQLite/Firebird e Win32/Win64:
   e compostas pelo engine local;
 - EX-17-04: soma local coincidiu com a soma do mesmo recorte no servidor;
 - EX-17-05: o SQLite local reportou versão 3.42.0 e rejeitou `GEN_UUID()` e `FIRST`.
+- EX-17-06: `OnGetDataSet` resolveu somente `snapshot.products`, manteve o
+  ownership externo e rejeitou `snapshot.unknown_source`.
 
-São vinte execuções. A primeira tentativa de EX-17-03 registrou a fonte como
+São 24 execuções. A primeira tentativa de EX-17-03 registrou a fonte como
 `sqlite_products` e foi recusada porque nomes iniciados por `sqlite_` são reservados;
 o contrato passou a usar `source_products`.

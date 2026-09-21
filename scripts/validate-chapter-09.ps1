@@ -48,7 +48,7 @@ foreach ($architecture in @('Win32', 'Win64')) {
 
   foreach ($driver in @('SQLite', 'FB')) {
     $env:CH09_DRIVER = $driver
-    foreach ($mode in @('ondemand', 'all', 'blob', 'cancel')) {
+    foreach ($mode in @('ondemand', 'all', 'blob', 'cancel', 'timeout')) {
       $traceFile = Join-Path (Resolve-Path '.deps').Path `
         "chapter09-$architecture-$driver-$mode-trace.txt"
       $env:CH09_TRACE_FILE = $traceFile

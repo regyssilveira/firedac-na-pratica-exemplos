@@ -416,6 +416,15 @@
       ]
     },
     {
+      "id": "EX-09-06",
+      "chapter": 9,
+      "title": "Timeout bloqueante e reutilização da conexão",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-09/evidence/README.md"
+      ]
+    },
+    {
       "id": "EX-10-01",
       "chapter": 10,
       "title": "Commit de pedido completo",
@@ -815,6 +824,15 @@
       "id": "EX-17-05",
       "chapter": 17,
       "title": "Limites de função/dialeto local",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-17/evidence/README.md"
+      ]
+    },
+    {
+      "id": "EX-17-06",
+      "chapter": 17,
+      "title": "Descoberta controlada com OnGetDataSet",
       "status": "RV",
       "evidence": [
         "chapters/chapter-17/evidence/README.md"
