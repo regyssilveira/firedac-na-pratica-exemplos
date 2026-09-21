@@ -272,6 +272,15 @@
       ]
     },
     {
+      "id": "EX-06-06",
+      "chapter": 6,
+      "title": "Validação do contrato de parâmetros",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-06/evidence/README.md"
+      ]
+    },
+    {
       "id": "EX-07-01",
       "chapter": 7,
       "title": "Locate simples e composto",

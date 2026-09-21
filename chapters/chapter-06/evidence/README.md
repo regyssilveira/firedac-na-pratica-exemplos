@@ -16,6 +16,7 @@ Comando reproduzível: `scripts/validate-chapter-06.ps1`.
 | EX-06-03 — data, hora e fuso | aprovado | aprovado | aprovado | aprovado |
 | EX-06-04 — BLOB por stream | aprovado | aprovado | aprovado | aprovado |
 | EX-06-05 — matriz de tipos | aprovado | aprovado | aprovado | aprovado |
+| EX-06-06 — contrato de parâmetros | aprovado | aprovado | aprovado | aprovado |
 
 Os modos foram executados em processos independentes. Toda escrita ocorreu em
 transação explícita terminada em `Rollback`.
@@ -58,7 +59,7 @@ classes concretas por driver, evita recomendar `AsBoolean` para o campo inteiro 
 SQLite, distingue timestamp com offset de texto UTC canônico e informa que o teste de
 8 KiB não comprova comportamento de BLOBs grandes.
 
-EX-06-01 a EX-06-05 podem avançar a `RV`. Parâmetros opcionais, allowlist, temporal,
-BLOB e tipos possuem asserções executadas nos quatro perfis. Planos de consulta,
+EX-06-01 a EX-06-06 podem avançar a `RV`. Parâmetros opcionais, allowlist, temporal,
+BLOB, tipos e contrato de parâmetros possuem asserções executadas nos quatro perfis. Planos de consulta,
 PostgreSQL, MySQL e cenários de alto volume permanecem explicitamente fora do estado
 revisado deste capítulo.

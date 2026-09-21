@@ -8,6 +8,7 @@ uses
   System.Hash,
   System.Math,
   System.DateUtils,
+  System.TypInfo,
   System.Variants,
   Data.DB,
   Data.SqlTimSt,
@@ -35,6 +36,21 @@ procedure Check(ACondition: Boolean; const AMessage: string);
 begin
   if not ACondition then
     raise Exception.Create(AMessage);
+end;
+
+procedure RequireParam(AQuery: TFDQuery; const AName: string;
+  AType: TFieldType; AParamType: TParamType);
+var
+  Parameter: TFDParam;
+begin
+  Parameter := AQuery.ParamByName(AName);
+  if (Parameter.DataType <> AType) or (Parameter.ParamType <> AParamType) then
+    raise EDatabaseError.CreateFmt(
+      'Parâmetro %s: esperado %s/%s, obtido %s/%s',
+      [AName, GetEnumName(TypeInfo(TFieldType), Ord(AType)),
+       GetEnumName(TypeInfo(TParamType), Ord(AParamType)),
+       GetEnumName(TypeInfo(TFieldType), Ord(Parameter.DataType)),
+       GetEnumName(TypeInfo(TParamType), Ord(Parameter.ParamType))]);
 end;
 
 function RequiredEnvironment(const AName: string): string;
@@ -410,9 +426,54 @@ begin
     end);
 end;
 
+procedure RunParameterContract;
+begin
+  WithConnection(
+    procedure(Connection: TFDConnection)
+    var
+      Query: TFDQuery;
+      ExpectedType: TFieldType;
+      MismatchDetected: Boolean;
+    begin
+      Query := TFDQuery.Create(nil);
+      try
+        Query.Connection := Connection;
+        Query.SQL.Text := '''
+          SELECT id, sku, name
+          FROM product
+          WHERE id = :id
+          ''';
+        if IsFirebird then
+          ExpectedType := ftLargeint
+        else
+          ExpectedType := ftInteger;
+        Query.ParamByName('id').DataType := ExpectedType;
+        Query.ParamByName('id').ParamType := ptInput;
+        Query.Prepare;
+        RequireParam(Query, 'id', ExpectedType, ptInput);
+
+        MismatchDetected := False;
+        try
+          RequireParam(Query, 'id', ftString, ptInput);
+        except
+          on CaughtException: EDatabaseError do
+            MismatchDetected := Pos('esperado ftString/ptInput',
+              CaughtException.Message) > 0;
+        end;
+        Check(MismatchDetected,
+          'O validador não detectou a divergência deliberada de tipo.');
+        Writeln(Format(
+          'EX-06-06 aprovado: id=%s/ptInput; divergência ftString detectada.',
+          [GetEnumName(TypeInfo(TFieldType), Ord(ExpectedType))]));
+      finally
+        Query.Free;
+      end;
+    end);
+end;
+
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter06Checks optional|allowlist|datetime|blob|types');
+  Writeln('Uso: Chapter06Checks optional|allowlist|datetime|blob|types|contract');
 end;
 
 begin
@@ -432,6 +493,8 @@ begin
       RunBlobStream
     else if SameText(ParamStr(1), 'types') then
       RunTypeMatrix
+    else if SameText(ParamStr(1), 'contract') then
+      RunParameterContract
     else
     begin
       ShowUsage;

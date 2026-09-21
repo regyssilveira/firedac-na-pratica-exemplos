@@ -46,7 +46,7 @@ foreach ($architecture in @('Win32', 'Win64')) {
 
   foreach ($driver in @('SQLite', 'FB')) {
     $env:CH06_DRIVER = $driver
-    foreach ($mode in @('optional', 'allowlist', 'datetime', 'blob', 'types')) {
+    foreach ($mode in @('optional', 'allowlist', 'datetime', 'blob', 'types', 'contract')) {
       & $executable $mode
       if ($LASTEXITCODE -ne 0) {
         throw "Teste $mode/$driver/$architecture falhou."
@@ -55,4 +55,4 @@ foreach ($architecture in @('Win32', 'Win64')) {
   }
 }
 
-Write-Output 'Capítulo 6 aprovado: cinco exemplos em SQLite/Firebird e Win32/Win64.'
+Write-Output 'Capítulo 6 aprovado: seis exemplos em SQLite/Firebird e Win32/Win64.'
