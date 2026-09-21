@@ -605,6 +605,15 @@
       ]
     },
     {
+      "id": "EX-12-06",
+      "chapter": 12,
+      "title": "Ciclo de AutoClose e reutilização da conexão",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-12/evidence/README.md"
+      ]
+    },
+    {
       "id": "EX-13-01",
       "chapter": 13,
       "title": "Array DML de produtos",
@@ -827,6 +836,15 @@
       "status": "RV",
       "evidence": [
         "chapters/chapter-17/evidence/README.md"
+      ]
+    },
+    {
+      "id": "EX-11-11",
+      "chapter": 11,
+      "title": "Parâmetros especiais com OnMasterSetValues",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-11/evidence/README.md"
       ]
     },
     {

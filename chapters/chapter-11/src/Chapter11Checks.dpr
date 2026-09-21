@@ -37,8 +37,34 @@ type
     property Count: Integer read FCount;
   end;
 
+  TMasterParameterProbe = class
+  private
+    FMaster: TFDQuery;
+    FDetail: TFDQuery;
+    FCount: Integer;
+  public
+    constructor Create(AMaster, ADetail: TFDQuery);
+    procedure SetValues(ADataSet: TFDDataSet);
+    property Count: Integer read FCount;
+  end;
+
 procedure TExecutionProbe.CountExecution(ADataSet: TFDDataSet);
 begin
+  Inc(FCount);
+end;
+
+constructor TMasterParameterProbe.Create(AMaster, ADetail: TFDQuery);
+begin
+  inherited Create;
+  FMaster := AMaster;
+  FDetail := ADetail;
+end;
+
+procedure TMasterParameterProbe.SetValues(ADataSet: TFDDataSet);
+begin
+  FDetail.ParamByName('order_id').AsLargeInt :=
+    FMaster.FieldByName('id').AsLargeInt;
+  FDetail.ParamByName('minimum_line').AsInteger := 1;
   Inc(FCount);
 end;
 
@@ -773,9 +799,68 @@ begin
   end;
 end;
 
+procedure RunMasterSetValues;
+var
+  Link: TFDPhysFBDriverLink;
+  Connection: TFDConnection;
+  Master, Detail: TFDQuery;
+  Source: TDataSource;
+  Probe: TMasterParameterProbe;
+begin
+  Link := TFDPhysFBDriverLink.Create(nil);
+  Connection := NewConnection(Link);
+  Master := TFDQuery.Create(nil);
+  Detail := TFDQuery.Create(nil);
+  Source := TDataSource.Create(nil);
+  Probe := TMasterParameterProbe.Create(Master, Detail);
+  try
+    PrepareTwoOrders(Connection);
+    Master.Connection := Connection;
+    Master.SQL.Text := '''
+      SELECT id, idempotency_key, order_status, total
+      FROM sales_order
+      WHERE id BETWEEN 111001 AND 111002
+      ORDER BY id
+      ''';
+    Source.DataSet := Master;
+    Detail.Connection := Connection;
+    Detail.SQL.Text := '''
+      SELECT id, order_id, line_no, product_id, quantity, unit_price
+      FROM sales_order_item
+      WHERE order_id = :order_id AND line_no >= :minimum_line
+      ORDER BY line_no
+      ''';
+    Detail.MasterSource := Source;
+    Detail.OnMasterSetValues := Probe.SetValues;
+    Master.Open;
+    Detail.Open;
+    Check(Detail.ParamByName('order_id').AsLargeInt = 111001,
+      'O evento não atribuiu a chave do primeiro mestre.');
+    Check(Detail.ParamByName('minimum_line').AsInteger = 1,
+      'O evento não atribuiu o contexto adicional.');
+    Check(Detail.RecordCount = 2, 'O primeiro mestre não exibiu dois itens.');
+    Master.Next;
+    Check(Detail.ParamByName('order_id').AsLargeInt = 111002,
+      'O evento não acompanhou a troca do mestre.');
+    Check(Detail.RecordCount = 1, 'O segundo mestre não exibiu um item.');
+    Check(Probe.Count >= 2, 'OnMasterSetValues não acompanhou as duas posições.');
+    Writeln(Format(
+      'EX-11-11 aprovado: callbacks=%d; parâmetros de chave e contexto validados.',
+      [Probe.Count]));
+  finally
+    Probe.Free;
+    Source.Free;
+    Detail.Free;
+    Master.Free;
+    DeleteOrders(Connection, 111001, 111002);
+    Connection.Free;
+    Link.Free;
+  end;
+end;
+
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter11Checks parameter|range|generated|cascade|atomic|cache|delay|composite|newdetails|conflict');
+  Writeln('Uso: Chapter11Checks parameter|range|generated|cascade|atomic|cache|delay|composite|newdetails|conflict|mastervalues');
 end;
 
 begin
@@ -797,6 +882,7 @@ begin
     else if SameText(ParamStr(1), 'composite') then RunCompositeKey
     else if SameText(ParamStr(1), 'newdetails') then RunNewMasterDetails
     else if SameText(ParamStr(1), 'conflict') then RunConflictRetry
+    else if SameText(ParamStr(1), 'mastervalues') then RunMasterSetValues
     else
     begin
       ShowUsage;

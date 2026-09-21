@@ -3,6 +3,7 @@
 - `procedure`: deriva e executa parâmetros IN/OUT no Firebird; registra a ausência no SQLite;
 - `function`: função escalar e procedure selecionável Firebird versus view/SELECT SQLite;
 - `multiset`: consome um conjunto e detecta seu término sem presumir um próximo;
+- `autoclose`: preserva o cursor, encerra resultados e comprova a reutilização da conexão;
 - `close`: fecha pedido e grava outbox uma única vez, com retry idempotente;
 - `event`: compara evento transacional entre conexões no Firebird e `Events` local SQLite.
 

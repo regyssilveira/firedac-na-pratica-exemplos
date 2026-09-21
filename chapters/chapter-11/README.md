@@ -10,6 +10,8 @@
 - `composite`: chave composta explícita e ordenada;
 - `newdetails`: chave temporária propagada a três filhos;
 - `conflict`: conflito otimista, rollback, releitura e nova tentativa.
+- `mastervalues`: `OnMasterSetValues` atribui a chave do mestre e um parâmetro
+  adicional de contexto a cada troca de registro.
 
 ```powershell
 .\scripts\validate-chapter-11.ps1 `
@@ -17,5 +19,5 @@
   -AppPassword '<senha-do-laboratório>'
 ```
 
-O script recria o M0, compila para Win32 e Win64 e executa os dez contratos em
+O script recria o M0, compila para Win32 e Win64 e executa os onze contratos em
 SQLite e Firebird. Os fixtures são descartáveis e restaurados por cenário.

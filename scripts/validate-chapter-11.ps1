@@ -37,7 +37,7 @@ $env:FIRESTORE_DB_PASSWORD = $AppPassword
 
 $modes = @(
   'parameter', 'range', 'generated', 'cascade', 'atomic',
-  'cache', 'delay', 'composite', 'newdetails', 'conflict'
+  'cache', 'delay', 'composite', 'newdetails', 'conflict', 'mastervalues'
 )
 foreach ($architecture in @('Win32', 'Win64')) {
   $sqliteDatabase = Get-ChildItem ".deps\firestore\m0-*-$architecture.sqlite" |

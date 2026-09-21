@@ -21,6 +21,7 @@ Comando reproduzível: `scripts/validate-chapter-11.ps1`.
 | EX-11-08 — chave composta | aprovado | aprovado | aprovado | aprovado |
 | EX-11-09 — mestre e três filhos | aprovado | aprovado | aprovado | aprovado |
 | EX-11-10 — conflito e retry | aprovado | aprovado | aprovado | aprovado |
+| EX-11-11 — `OnMasterSetValues` | aprovado | aprovado | aprovado | aprovado |
 
 ## Relação e identidade
 
@@ -29,6 +30,10 @@ e `ActualDetailFields = order_id`. EX-11-02 abriu as três linhas uma vez e apli
 ranges locais 2/1/2 com `IndexFieldNames = order_id`. EX-11-08 distinguiu duas
 empresas com o mesmo número de pedido usando a chave ordenada
 `company_id;order_id`.
+
+EX-11-11 executou `OnMasterSetValues` duas vezes ao navegar entre os pedidos. Em
+cada chamada, o evento atribuiu `order_id` a partir do mestre e `minimum_line = 1`
+como contexto adicional; o detalhe retornou respectivamente duas e uma linhas.
 
 EX-11-03 obteve uma identidade real do banco e gravou um item com essa FK. Os valores
 concretos diferiram, como esperado: SQLite reutilizou 111003 nos bancos descartáveis;

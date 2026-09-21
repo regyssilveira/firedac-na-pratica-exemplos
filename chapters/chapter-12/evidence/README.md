@@ -16,6 +16,7 @@ Comando reproduzível: `scripts/validate-chapter-12.ps1`.
 | EX-12-03 — resultados seguintes | nenhum | nenhum | nenhum | nenhum |
 | EX-12-04 — fechamento | adapter aprovado | adapter aprovado | aprovado | aprovado |
 | EX-12-05 — evento | local aprovado | local aprovado | servidor aprovado | servidor aprovado |
+| EX-12-06 — ciclo de `AutoClose` | aprovado | aprovado | aprovado | aprovado |
 
 ## Rotinas e resultados
 
@@ -31,6 +32,11 @@ SQLite obteve o mesmo resultado de domínio pela view `order_total_view` e por u
 EX-12-03 abriu um único `SELECT`, consumiu seu valor e chamou `NextRecordSet`. O
 dataset ficou inativo nos quatro perfis. O teste prova o término correto do fluxo; não
 alega que Firebird ou SQLite suportam procedures com vários conjuntos independentes.
+
+EX-12-06 confirmou que `AutoClose` começa em `True`, configurou-o como `False`,
+consumiu duas linhas até `EOF`, chamou `NextRecordSet` e então observou o dataset
+inativo. Um novo comando executado na mesma conexão comprovou sua reutilização. O
+ensaio valida a política e o ciclo terminal, não múltiplos recordsets nativos.
 
 ## Fechamento idempotente
 
@@ -58,4 +64,4 @@ Não foram testadas rotinas com overload, packages, BLOB de saída, parâmetros 
 cancelamento, perda de conexão ou múltiplos recordsets nativos de outro SGBD. Evento
 não foi tratado como fila durável; outbox continua sendo a garantia de persistência.
 
-EX-12-01 a EX-12-05 podem avançar a `RV` após revisão cruzada do manuscrito.
+EX-12-01 a EX-12-06 podem avançar a `RV` após revisão cruzada do manuscrito.

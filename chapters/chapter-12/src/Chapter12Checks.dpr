@@ -270,6 +270,62 @@ begin
   end;
 end;
 
+procedure RunAutoCloseLifecycle;
+var
+  Link: TFDPhysFBDriverLink;
+  Connection: TFDConnection;
+  Query: TFDQuery;
+  RowCount: Integer;
+begin
+  Link := TFDPhysFBDriverLink.Create(nil);
+  Connection := NewConnection(Link);
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := Connection;
+    Check(Query.FetchOptions.AutoClose,
+      'AutoClose deveria iniciar com o valor padrão True.');
+    Query.FetchOptions.AutoClose := False;
+    Check(not Query.FetchOptions.AutoClose,
+      'AutoClose não preservou a configuração False.');
+    if IsFirebird then
+      Query.SQL.Text :=
+        '''
+          SELECT 1 AS result_no FROM rdb$database
+          UNION ALL
+          SELECT 2 AS result_no FROM rdb$database
+          '''
+    else
+      Query.SQL.Text :=
+        '''
+          SELECT 1 AS result_no
+          UNION ALL
+          SELECT 2 AS result_no
+          ''';
+    Query.Open;
+    RowCount := 0;
+    while not Query.Eof do
+    begin
+      Inc(RowCount);
+      Query.Next;
+    end;
+    Check(RowCount = 2, 'O conjunto corrente deveria conter duas linhas.');
+    Check(Query.Active,
+      'O dataset deveria permanecer ativo antes de NextRecordSet.');
+    Query.NextRecordSet;
+    Check(not Query.Active,
+      'O dataset deveria ficar inativo após confirmar o fim dos resultados.');
+    Check(Connection.Connected,
+      'A conexão deveria continuar reutilizável após encerrar os resultados.');
+    Check(Connection.ExecSQLScalar('SELECT COUNT(*) FROM product') >= 0,
+      'A conexão não aceitou um novo comando após o encerramento.');
+    Writeln('EX-12-06 aprovado: AutoClose=False, consumo, término e reutilização validados.');
+  finally
+    Query.Free;
+    Connection.Free;
+    Link.Free;
+  end;
+end;
+
 procedure CloseOrderSQLite(AConnection: TFDConnection; AOrderId: Int64;
   const AOperationKey: string; out AStatus: string; out ATotal: Currency;
   out AChanged: Boolean);
@@ -481,7 +537,7 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter12Checks procedure|function|multiset|close|event');
+  Writeln('Uso: Chapter12Checks procedure|function|multiset|autoclose|close|event');
 end;
 
 begin
@@ -494,6 +550,7 @@ begin
     else if SameText(ParamStr(1), 'procedure') then RunProcedure
     else if SameText(ParamStr(1), 'function') then RunFunction
     else if SameText(ParamStr(1), 'multiset') then RunMultipleResults
+    else if SameText(ParamStr(1), 'autoclose') then RunAutoCloseLifecycle
     else if SameText(ParamStr(1), 'close') then RunCloseOrder
     else if SameText(ParamStr(1), 'event') then RunEvent
     else
