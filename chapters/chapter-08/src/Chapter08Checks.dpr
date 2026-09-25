@@ -179,6 +179,7 @@ procedure RunInternalCalc;
 var
   Items: TFDMemTable;
   LineTotal: TCurrencyField;
+  ExpressionTotal: TCurrencyField;
   Context: TInternalCalcContext;
   CallsAfterLoad: Integer;
 begin
@@ -196,6 +197,13 @@ begin
     LineTotal.ProviderFlags := [];
     LineTotal.DataSet := Items;
 
+    ExpressionTotal := TCurrencyField.Create(Items);
+    ExpressionTotal.FieldName := 'expression_total';
+    ExpressionTotal.FieldKind := fkInternalCalc;
+    ExpressionTotal.DefaultExpression := 'quantity * unit_price';
+    ExpressionTotal.ProviderFlags := [];
+    ExpressionTotal.DataSet := Items;
+
     Items.OnCalcFields := Context.Calculate;
     Items.CreateDataSet;
     Items.AppendRecord([1, 2, 10.00]);
@@ -204,9 +212,13 @@ begin
 
     Check(Items.FieldByName('line_total').AsCurrency = 20.00,
       'Cálculo interno da primeira linha está incorreto.');
+    Check(Items.FieldByName('expression_total').AsCurrency = 20.00,
+      'DefaultExpression da primeira linha está incorreta.');
     Items.Next;
     Check(Items.FieldByName('line_total').AsCurrency = 15.00,
       'Cálculo interno da segunda linha está incorreto.');
+    Check(Items.FieldByName('expression_total').AsCurrency = 15.00,
+      'DefaultExpression da segunda linha está incorreta.');
     CallsAfterLoad := Context.Calls;
 
     Items.OnCalcFields := nil;
@@ -222,6 +234,8 @@ begin
       'FireDAC não declarou fkInternalCalc como campo calculado armazenado.');
     Check(not (pfInUpdate in LineTotal.ProviderFlags),
       'Campo de cálculo interno entrou nos campos atualizáveis.');
+    Check(not (pfInUpdate in ExpressionTotal.ProviderFlags),
+      'Campo de expressão interna entrou nos campos atualizáveis.');
 
     Writeln(Format(
       'EX-08-06 aprovado: fkInternalCalc armazenou 20 e 15; chamadas=%d.',
@@ -284,6 +298,7 @@ procedure RunAggregate;
 var
   Items: TFDMemTable;
   Total: TAggregateField;
+  ItemCount: TFDAggregate;
 begin
   Items := TFDMemTable.Create(nil);
   try
@@ -296,12 +311,18 @@ begin
     Total.Expression := 'SUM(quantity * unit_price)';
     Total.DataSet := Items;
     Total.Active := True;
+    ItemCount := Items.Aggregates.Add;
+    ItemCount.Name := 'item_count';
+    ItemCount.Expression := 'COUNT(*)';
+    ItemCount.Active := True;
     Items.CreateDataSet;
     Items.AggregatesActive := True;
     Items.AppendRecord([2, 10.00]);
     Items.AppendRecord([3, 5.00]);
     Check(Abs(Currency(VarAsType(Total.Value, varCurrency)) - 35.00) < 0.001,
       'Agregado inicial não totalizou 35.');
+    Check(Integer(VarAsType(ItemCount.Value, varInteger)) = 2,
+      'Coleção Aggregates não contou duas linhas.');
     Items.Edit;
     Items.FieldByName('quantity').AsInteger := 4;
     Items.Post;

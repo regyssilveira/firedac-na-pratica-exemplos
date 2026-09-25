@@ -30,11 +30,13 @@ dataset em ambos os binários. Os exemplos 04 e 05 executam DML real nos dois ba
   Seu `ProviderFlags` também foi esvaziado explicitamente.
 - O agregado `SUM(quantity * unit_price)` passou de 35 para 40 após `Post`; uma edição
   posterior cancelada manteve 40. `TAggregateField.Active` precisou ser configurado
-  antes de abrir o dataset, além de `AggregatesActive` no dataset.
-- O campo `line_total`, declarado como `fkInternalCalc`, guardou 20,00 e 15,00 nos
-  respectivos registros. Depois que o teste removeu `OnCalcFields`, a navegação
-  recuperou os mesmos valores sem novas chamadas. O ensaio também confirmou
-  `fkInternalCalc` em `FormatOptions.StoredCalcFields` e o campo fora do DML.
+  antes de abrir o dataset, além de `AggregatesActive` no dataset. A forma por coleção
+  `TFDDataSet.Aggregates` também contou as duas linhas com `COUNT(*)`.
+- Os campos internos calculados por `OnCalcFields` e por `DefaultExpression` guardaram
+  20,00 e 15,00 nos respectivos registros. Depois que o teste removeu o evento, a
+  navegação recuperou os valores produzidos por ele sem novas chamadas. O ensaio
+  também confirmou `fkInternalCalc` em `FormatOptions.StoredCalcFields` e os dois
+  campos fora do DML.
 
 ## Query com join e SQL capturado
 
