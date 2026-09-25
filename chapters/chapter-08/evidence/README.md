@@ -1,6 +1,6 @@
 # Evidência — capítulo 8
 
-**Data:** 3 de setembro de 2026
+**Data da última ampliação:** 24 de setembro de 2026
 
 **Ambiente:** RAD Studio 13 Florence, Delphi 37.0; Firebird 5.0.4 por TCP;
 SQLite estático do FireDAC; clientes Firebird Win32 e Win64.
@@ -16,9 +16,10 @@ Comando reproduzível: `scripts/validate-chapter-08.ps1`.
 | EX-08-03 — agregado | aprovado | aprovado | aprovado | aprovado |
 | EX-08-04 — update de join | aprovado | aprovado | aprovado | aprovado |
 | EX-08-05 — `TFDUpdateSQL` | aprovado | aprovado | aprovado | aprovado |
+| EX-08-06 — cálculo interno | aprovado | aprovado | aprovado | aprovado |
 
-Os três primeiros exemplos usam `TFDMemTable` e comprovam comportamento da camada de
-dataset em ambos os binários. Os dois últimos executam DML real nos dois bancos.
+Os exemplos 01, 02, 03 e 06 usam `TFDMemTable` e comprovam comportamento da camada de
+dataset em ambos os binários. Os exemplos 04 e 05 executam DML real nos dois bancos.
 
 ## Campos virtuais
 
@@ -30,6 +31,10 @@ dataset em ambos os binários. Os dois últimos executam DML real nos dois banco
 - O agregado `SUM(quantity * unit_price)` passou de 35 para 40 após `Post`; uma edição
   posterior cancelada manteve 40. `TAggregateField.Active` precisou ser configurado
   antes de abrir o dataset, além de `AggregatesActive` no dataset.
+- O campo `line_total`, declarado como `fkInternalCalc`, guardou 20,00 e 15,00 nos
+  respectivos registros. Depois que o teste removeu `OnCalcFields`, a navegação
+  recuperou os mesmos valores sem novas chamadas. O ensaio também confirmou
+  `fkInternalCalc` em `FormatOptions.StoredCalcFields` e o campo fora do DML.
 
 ## Query com join e SQL capturado
 
@@ -70,6 +75,6 @@ nos campos virtuais criados em runtime, documenta a ativação do agregado, sepa
 `Post` de `Commit`, mostra o SQL automático capturado e identifica conflito somente
 pela exceção específica de zero linhas atualizadas.
 
-EX-08-01 a EX-08-05 podem avançar a `RV`. Cada afirmação apresentada como resultado
+EX-08-01 a EX-08-06 estão em `RV`. Cada afirmação apresentada como resultado
 possui asserção nos binários correspondentes; cached updates, inserts e reconciliação
 continuam fora desse estado.

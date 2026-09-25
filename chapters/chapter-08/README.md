@@ -1,8 +1,9 @@
 # Capítulo 8 — edição e regras de atualização
 
-O projeto separa cinco contratos:
+O projeto separa seis contratos:
 
 - `calculated`: campo `fkCalculated`, chamadas de `OnCalcFields` e `ProviderFlags`;
+- `internalcalc`: cálculo disparado por `OnCalcFields` e valor armazenado por registro;
 - `lookup`: chave válida e ausente em campo `fkLookup`;
 - `aggregate`: total local durante append, post e cancel;
 - `join`: update automático delimitado a `product`, com SQL capturado por trace;

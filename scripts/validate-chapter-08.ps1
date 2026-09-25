@@ -46,7 +46,14 @@ foreach ($architecture in @('Win32', 'Win64')) {
 
   foreach ($driver in @('SQLite', 'FB')) {
     $env:CH08_DRIVER = $driver
-    foreach ($mode in @('calculated', 'lookup', 'aggregate', 'join', 'conflict')) {
+    foreach ($mode in @(
+      'calculated',
+      'internalcalc',
+      'lookup',
+      'aggregate',
+      'join',
+      'conflict'
+    )) {
       $traceFile = Join-Path (Resolve-Path '.deps').Path `
         "chapter08-$architecture-$driver-$mode-trace.txt"
       $env:CH08_TRACE_FILE = $traceFile
@@ -68,4 +75,4 @@ foreach ($architecture in @('Win32', 'Win64')) {
   }
 }
 
-Write-Output 'Capítulo 8 aprovado: cinco exemplos em SQLite/Firebird e Win32/Win64.'
+Write-Output 'Capítulo 8 aprovado: seis exemplos em SQLite/Firebird e Win32/Win64.'

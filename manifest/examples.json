@@ -371,6 +371,15 @@
       ]
     },
     {
+      "id": "EX-08-06",
+      "chapter": 8,
+      "title": "Campo de cálculo interno",
+      "status": "RV",
+      "evidence": [
+        "chapters/chapter-08/evidence/README.md"
+      ]
+    },
+    {
       "id": "EX-09-01",
       "chapter": 9,
       "title": "Fetch sob demanda",

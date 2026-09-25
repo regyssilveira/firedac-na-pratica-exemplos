@@ -36,11 +36,25 @@ type
     procedure Calculate(DataSet: TDataSet);
   end;
 
+  TInternalCalcContext = class
+  public
+    Calls: Integer;
+    procedure Calculate(DataSet: TDataSet);
+  end;
+
 procedure TCalcContext.Calculate(DataSet: TDataSet);
 begin
   Inc(Calls);
   DataSet.FieldByName('display_name').AsString := Format('%s - %s',
     [DataSet.FieldByName('sku').AsString, DataSet.FieldByName('name').AsString]);
+end;
+
+procedure TInternalCalcContext.Calculate(DataSet: TDataSet);
+begin
+  Inc(Calls);
+  DataSet.FieldByName('line_total').AsCurrency :=
+    DataSet.FieldByName('quantity').AsInteger *
+    DataSet.FieldByName('unit_price').AsCurrency;
 end;
 
 procedure Check(ACondition: Boolean; const AMessage: string);
@@ -158,6 +172,63 @@ begin
   finally
     Context.Free;
     Mem.Free;
+  end;
+end;
+
+procedure RunInternalCalc;
+var
+  Items: TFDMemTable;
+  LineTotal: TCurrencyField;
+  Context: TInternalCalcContext;
+  CallsAfterLoad: Integer;
+begin
+  Items := TFDMemTable.Create(nil);
+  Context := TInternalCalcContext.Create;
+  try
+    Items.FieldDefs.Add('id', ftInteger);
+    Items.FieldDefs.Add('quantity', ftInteger);
+    Items.FieldDefs.Add('unit_price', ftCurrency);
+    AddPhysicalFields(Items);
+
+    LineTotal := TCurrencyField.Create(Items);
+    LineTotal.FieldName := 'line_total';
+    LineTotal.FieldKind := fkInternalCalc;
+    LineTotal.ProviderFlags := [];
+    LineTotal.DataSet := Items;
+
+    Items.OnCalcFields := Context.Calculate;
+    Items.CreateDataSet;
+    Items.AppendRecord([1, 2, 10.00]);
+    Items.AppendRecord([2, 3, 5.00]);
+    Items.First;
+
+    Check(Items.FieldByName('line_total').AsCurrency = 20.00,
+      'Cálculo interno da primeira linha está incorreto.');
+    Items.Next;
+    Check(Items.FieldByName('line_total').AsCurrency = 15.00,
+      'Cálculo interno da segunda linha está incorreto.');
+    CallsAfterLoad := Context.Calls;
+
+    Items.OnCalcFields := nil;
+    Items.First;
+    Check(Items.FieldByName('line_total').AsCurrency = 20.00,
+      'Valor interno da primeira linha não permaneceu armazenado.');
+    Items.Next;
+    Check(Items.FieldByName('line_total').AsCurrency = 15.00,
+      'Valor interno da segunda linha não permaneceu armazenado.');
+    Check(Context.Calls = CallsAfterLoad,
+      'OnCalcFields foi chamado depois de o evento ser removido.');
+    Check(fkInternalCalc in Items.FormatOptions.StoredCalcFields,
+      'FireDAC não declarou fkInternalCalc como campo calculado armazenado.');
+    Check(not (pfInUpdate in LineTotal.ProviderFlags),
+      'Campo de cálculo interno entrou nos campos atualizáveis.');
+
+    Writeln(Format(
+      'EX-08-06 aprovado: fkInternalCalc armazenou 20 e 15; chamadas=%d.',
+      [CallsAfterLoad]));
+  finally
+    Context.Free;
+    Items.Free;
   end;
 end;
 
@@ -381,7 +452,8 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Uso: Chapter08Checks calculated|lookup|aggregate|join|conflict');
+  Writeln(
+    'Uso: Chapter08Checks calculated|internalcalc|lookup|aggregate|join|conflict');
 end;
 
 begin
@@ -393,6 +465,8 @@ begin
     end
     else if SameText(ParamStr(1), 'calculated') then
       RunCalculated
+    else if SameText(ParamStr(1), 'internalcalc') then
+      RunInternalCalc
     else if SameText(ParamStr(1), 'lookup') then
       RunLookup
     else if SameText(ParamStr(1), 'aggregate') then
