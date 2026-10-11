@@ -8,6 +8,11 @@ Este laboratório executável cobre os cinco contratos do capítulo:
 - `transfer`: transfere duas linhas nos dois sentidos entre SQLite e Firebird;
 - `benchmark line|array quantidade`: compara DML preparado linha a linha com Array DML.
 
+O capítulo também propõe uma evolução com `batch_id`, registro durável de controle,
+checkpoint, lease e staging. Essa orquestração não está implementada nestes cinco
+ensaios. A evidência RV cobre os contratos acima, não a implementação completa de
+um importador recuperável; os recortes arquiteturais do livro delimitam essa diferença.
+
 O CSV usa ponto decimal e ponto e vírgula como delimitador. O exemplo configura tanto
 `DecimalSeparator` quanto `ThousandSeparator`; deixar o segundo com o valor da
 localidade pode remover silenciosamente o ponto antes da conversão. A coluna booleana
