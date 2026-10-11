@@ -1,5 +1,7 @@
 # FireDAC na Prática — exemplos oficiais
 
+[English guide to setup, validation, and runtime messages](README.en.md)
+
 Repositório público dos exemplos do livro **FireDAC na Prática: Do primeiro acesso
 ao banco às técnicas avançadas com Delphi**, de Régys Borges da Silveira.
 
