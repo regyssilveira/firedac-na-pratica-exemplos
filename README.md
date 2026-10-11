@@ -3,7 +3,7 @@
 Repositório público dos exemplos do livro **FireDAC na Prática: Do primeiro acesso
 ao banco às técnicas avançadas com Delphi**, de Régys Borges da Silveira.
 
-> Estado do repositório: 109 exemplos estão revisados (`RV`) e um permanece com
+> Estado do repositório: 118 exemplos estão revisados (`RV`) e um permanece com
 > evidência condicionada (`EC`). O item condicionado é `EX-21-04`, que depende da
 > validação do pacote Win32/Win64 em uma máquina limpa. Consulte o manifesto antes
 > de assumir o estado técnico de qualquer exemplo.
@@ -34,9 +34,11 @@ em `firestore/` e `manifest/evidence/M0/`, em vez de possuir um diretório
 
 ## Versão correspondente ao livro
 
-A primeira edição de 2026 corresponde à tag `livro-1.0.0-1ed-2026`. Para reproduzir
-exatamente a edição impressa, faça checkout dessa tag; a branch `main` continuará
-recebendo correções e aperfeiçoamentos posteriores.
+Os fontes atualizados para o fechamento da primeira edição de 2026 estão na branch
+`main`. O manifesto identifica os exemplos e suas evidências. Tags históricas não
+incorporam automaticamente correções posteriores e não devem ser presumidas como
+retratos deste fechamento. A revisão utilizada fica registrada nos controles
+editoriais internos; a branch pode receber novos aperfeiçoamentos após a publicação.
 
 Cada exemplo percorre os estados:
 
