@@ -21,8 +21,10 @@ FireStoreBootstrap.exe smoke
 ```
 
 `migrate` cria `schema_version`, valida o SHA-256 de migrations já aplicadas e aplica
-novas migrations em ordem. `smoke` exige duas versões aplicadas, duas categorias e
-três produtos conhecidos.
+novas migrations em ordem. A fundação M0 começou com V001/V002; o pacote atual
+contém V001 a V008. `smoke` exige oito versões aplicadas, duas categorias,
+três produtos conhecidos e três registros de estoque. Execute o conjunto completo
+de migrations; não retire arquivos para reproduzir uma contagem antiga do livro.
 
 ## Firebird local
 
