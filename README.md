@@ -3,6 +3,13 @@
 Repositório público dos exemplos do livro **FireDAC na Prática: Do primeiro acesso
 ao banco às técnicas avançadas com Delphi**, de Régys Borges da Silveira.
 
+## Livro publicado
+
+- [Edição impressa — UICLAP](https://loja.uiclap.com/titulo/ua211530/)
+- [Edição digital — Amazon Kindle](https://www.amazon.com.br/dp/B0HMP8NVG5)
+
+O lançamento não altera os estados de evidência dos exemplos abaixo.
+
 > Estado do repositório: 118 exemplos estão revisados (`RV`) e um permanece com
 > evidência condicionada (`EC`). O item condicionado é `EX-21-04`, que depende da
 > validação do pacote Win32/Win64 em uma máquina limpa. Consulte o manifesto antes
